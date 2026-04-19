@@ -180,6 +180,18 @@ main/urls/organisation_urls.py
 main/templates/organisation/organisation.html
 ```
 
+### Nasser – Login & Dashboard
+
+```
+main/views/dashboard_views.py
+main/urls/dashboard_urls.py
+main/templates/dashboard/index.html
+
+main/views/login_views.py
+main/urls/login_urls.py
+main/templates/login/login.html
+```
+
 ### Reports – Not assigned yet
 
 ---
