@@ -36,7 +36,7 @@ This defines:
 
 👉 Everyone uses the same models. Everyone CAN ADD new models but NOT CHANGE previous models or create duplicates.
 
-Note: a model is basically a table in the ERD like team, department or code_repository (https://app.diagrams.net/#G1uOL71CrAuLUbbfMsiOpaxTZx_7ns9gDZ#%7B%22pageId%22%3A%22y7M3dXuC5kAcrrcWm3Rq%22%7D)
+Note: a model is basically a table in the ERD like team, department or code_repository ([https://app.diagrams.net/#G1uOL71CrAuLUbbfMsiOpaxTZx_7ns9gDZ#%7B%22pageId%22%3A%22y7M3dXuC5kAcrrcWm3Rq%22%7D](https://app.diagrams.net/#G1uOL71CrAuLUbbfMsiOpaxTZx_7ns9gDZ#%7B%22pageId%22%3A%22y7M3dXuC5kAcrrcWm3Rq%22%7D))
 
 ---
 
@@ -98,12 +98,7 @@ Located in:
 main/urls/
 ```
 
-Each page has its own file:
-
-* `dashboard_urls.py`
-* `teams_urls.py`
-* `messages_urls.py`
-* etc.
+Each page has its own file.
 
 👉 This connects:
 
@@ -153,9 +148,7 @@ main/
 
 Each person ONLY works on their page.
 
-### 🟢 Kirtan – Messages
-
-Work on:
+### Kirtan – Messages
 
 ```
 main/views/messages_views.py
@@ -163,11 +156,7 @@ main/urls/messages_urls.py
 main/templates/messages/messages.html
 ```
 
----
-
-### 🔵 Elvin – Schedule
-
-Work on:
+### Elvin – Schedule
 
 ```
 main/views/schedule_views.py
@@ -175,11 +164,7 @@ main/urls/schedule_urls.py
 main/templates/schedule/schedule.html
 ```
 
----
-
-### 🟡 Kamil – Teams
-
-Work on:
+### Kamil – Teams
 
 ```
 main/views/teams_views.py
@@ -187,11 +172,7 @@ main/urls/teams_urls.py
 main/templates/teams/teams.html
 ```
 
----
-
-### 🟣 Batuhan – Organisation
-
-Work on:
+### Batuhan – Organisation
 
 ```
 main/views/organisation_views.py
@@ -199,39 +180,26 @@ main/urls/organisation_urls.py
 main/templates/organisation/organisation.html
 ```
 
----
-
-### ⚪ Reports – Not assigned yet
-
-Will follow same structure when implemented.
+### Reports – Not assigned yet
 
 ---
 
 ## ⚠️ Important Rules
 
-### ❗ Do NOT modify:
-
-* `models.py` (only if you need to add new models for your page, this is ok and needed)
-* other people’s files
-* global settings without agreement
+* Do NOT modify  models without agreement
+* Do NOT modify other people’s files
+* Keep your work isolated to your page
 
 ---
 
 ## 🧪 Running the Project
 
-### Activate virtual environment
-
 ```bash
 source venv/bin/activate
-```
-
-### Run server
-
-```bash
 python manage.py runserver
 ```
 
-### Open in browser
+Open:
 
 ```
 http://127.0.0.1:8000/
@@ -239,43 +207,70 @@ http://127.0.0.1:8000/
 
 ---
 
-## 🛠 Admin Panel (for data)
+## 🛠 Admin Panel
 
-Go to:
-
-```
-/admin
-```
-
-Use it to:
+Use `/admin` to:
 
 * add teams
 * add meetings
-* test your page data
+* test data
 
 ---
 
-## 🎯 Goal for Each Member
+## 🔁 Git Workflow (VERY IMPORTANT)
 
-Each person should:
+### Branches
 
-1. Fetch data from models
-2. Display it in their page
-3. Keep structure clean
-4. Not break other pages
+Each person works on their own branch:
+
+```
+kirtan
+elvin
+kamil
+batuhan
+```
+
+---
+
+### First time setup
+
+```bash
+git checkout -b your-name
+```
+
+---
+
+### Save your work (DO THIS ALWAYS)
+
+```bash
+git add .
+git commit -m "what you did"
+git push origin your-name
+```
+
+Example:
+
+```bash
+git commit -m "Add schedule page UI"
+git push origin elvin
+```
+
+---
+
+### Rules
+
+* NEVER push to main
+* ALWAYS push to your branch
+* commit often
+* clear messages to keep everyone on track
 
 ---
 
 ## 🚀 Final Notes
 
-* Keep things simple
-* Focus on your page only
-
----
-
-## 💬 If stuck
-
-Ask in the group before guessing.
+* Keep it simple
+* Focus on your page
+* Please ask for help if unsure
 
 ---
 
