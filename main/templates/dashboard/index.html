@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<p>Total Departments: {{ total_departments }}</p>
+<p>Total Teams: {{ total_teams }}</p>
+<p>On Track Teams: {{ on_track_teams }}</p>
+<p>At Risk Teams: {{ at_risk_teams }}</p>
+<p>Blocked Teams: {{ blocked_teams }}</p>
+
+<h2>Upcoming Meetings</h2>
+
+{% for meeting in upcoming_meetings %}
+    <p>
+        {{ meeting.title }} -
+        {{ meeting.date_time }} -
+        {{ meeting.organiser }}
+    </p>
+{% empty %}
+    <p>No upcoming meetings.</p>
+{% endfor %}
+{% endblock %}
