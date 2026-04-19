@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-x@q!a0_3m!97i-%lr20@wn$r^tsqzot0d(2&1ctb7n^=^l^nal
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['skyhub-django.onrender.com', '127.0.0.1', 'localhost']
 
 
 # Application definition
