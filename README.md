@@ -209,7 +209,7 @@ http://127.0.0.1:8000/
 
 ## 🛠 Admin Panel
 
-Use `/admin` to:
+Go to `/admin` to:
 
 * add teams
 * add meetings
@@ -228,14 +228,6 @@ kirtan
 elvin
 kamil
 batuhan
-```
-
----
-
-### First time setup
-
-```bash
-git checkout -b your-name
 ```
 
 ---
