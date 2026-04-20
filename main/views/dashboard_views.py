@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.utils import timezone
-from main.models import Department, Team, Meeting
+from main.models import Department, Team, Meeting, Profile
 
 def dashboard(request):
     total_departments = Department.objects.count()
@@ -14,6 +14,8 @@ def dashboard(request):
         date_time__gte=timezone.now()
     ).order_by('date_time')[:5]
 
+    employees = Profile.objects.select_related('user').order_by('first_name', 'last_name')
+
     context = {
         'total_departments': total_departments,
         'total_teams': total_teams,
@@ -21,6 +23,7 @@ def dashboard(request):
         'at_risk_teams': at_risk_teams,
         'blocked_teams': blocked_teams,
         'upcoming_meetings': upcoming_meetings,
+        'employees': employees,
     }
 
     return render(request, 'dashboard/index.html', context)

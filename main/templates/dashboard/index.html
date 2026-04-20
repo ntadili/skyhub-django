@@ -1,25 +1,148 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard — Sky Hub{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'main/css/dashboard.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
-<h1>Dashboard</h1>
+    <header class="mb-4">
+        <h1 class="dash-page-title">Dashboard</h1>
+        <p class="dash-page-subtitle">Search all teams, employees information and contact details</p>
+    </header>
 
-<p>Total Departments: {{ total_departments }}</p>
-<p>Total Teams: {{ total_teams }}</p>
-<p>On Track Teams: {{ on_track_teams }}</p>
-<p>At Risk Teams: {{ at_risk_teams }}</p>
-<p>Blocked Teams: {{ blocked_teams }}</p>
+    <div class="row g-3 mb-4">
 
-<h2>Upcoming Meetings</h2>
+        {# ===== Team Health Overview ===== #}
+        <div class="col-12 col-xl-8">
+            <section class="dash-card h-100">
+                <h2 class="dash-card-title">Team Health Overview</h2>
 
-{% for meeting in upcoming_meetings %}
-    <p>
-        {{ meeting.title }} -
-        {{ meeting.date_time }} -
-        {{ meeting.organiser }}
-    </p>
-{% empty %}
-    <p>No upcoming meetings.</p>
-{% endfor %}
+                <div class="dash-status-row">
+                    <span class="dash-status-pill">
+                        <span class="dash-status-dot dash-status-dot--critical"></span>
+                        <span class="dash-status-label">Critical</span>
+                        <span class="dash-status-count">{{ blocked_teams }} teams</span>
+                    </span>
+                    <span class="dash-status-pill">
+                        <span class="dash-status-dot dash-status-dot--risk"></span>
+                        <span class="dash-status-label">At risk</span>
+                        <span class="dash-status-count">{{ at_risk_teams }} teams</span>
+                    </span>
+                    <span class="dash-status-pill">
+                        <span class="dash-status-dot dash-status-dot--clear"></span>
+                        <span class="dash-status-label">Clear</span>
+                        <span class="dash-status-count">{{ on_track_teams }} teams</span>
+                    </span>
+                </div>
+
+                <h3 class="dash-card-subtitle">Critical (teams with active blockers)</h3>
+
+                <div class="dash-team-row">
+                    <span class="dash-team-tag">
+                        <span class="dash-status-dot dash-status-dot--critical"></span>
+                        <span class="dash-team-name">Core platform</span>
+                        <span class="dash-team-meta">11 employees</span>
+                    </span>
+                    <span class="dash-team-tag">
+                        <span class="dash-status-dot dash-status-dot--critical"></span>
+                        <span class="dash-team-name">Payments API</span>
+                        <span class="dash-team-meta">23 employees</span>
+                    </span>
+                    <span class="dash-team-more">+1 more</span>
+                </div>
+            </section>
+        </div>
+
+        {# ===== Upcoming Meetings ===== #}
+        <div class="col-12 col-xl-4">
+            <section class="dash-card h-100">
+                <h2 class="dash-card-title">Your upcoming meetings</h2>
+
+                {% for meeting in upcoming_meetings %}
+                    <div class="dash-meeting">
+                        <div class="flex-grow-1" style="min-width: 0;">
+                            <div class="dash-meeting-title text-truncate">{{ meeting.title }}</div>
+                            <div class="dash-meeting-time">{{ meeting.date_time|date:"D, H:i" }}</div>
+                        </div>
+                        <div class="dash-meeting-right">
+                            <span class="dash-avatar-stack">
+                                <span class="dash-avatar"></span>
+                                <span class="dash-avatar"></span>
+                                <span class="dash-avatar"></span>
+                            </span>
+                            <span class="dash-avatar-more">+{{ meeting.participants.count }} more</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="dash-meeting-empty">No upcoming meetings.</p>
+                {% endfor %}
+            </section>
+        </div>
+
+    </div>
+
+    {# ===== Search + Filter ===== #}
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-lg-9">
+            <div class="dash-search">
+                <i class="bi bi-search dash-search-icon"></i>
+                <input type="search"
+                       class="dash-search-input"
+                       placeholder="Search by name, email, or team department…"
+                       aria-label="Search employees">
+            </div>
+        </div>
+        <div class="col-12 col-lg-3">
+            <button type="button" class="dash-filter-btn">
+                <span>Filter</span>
+                <i class="bi bi-funnel"></i>
+            </button>
+        </div>
+    </div>
+
+    {# ===== Employees table ===== #}
+    <div class="dash-table-card">
+        <div class="table-responsive">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Team</th>
+                        <th>Department</th>
+                        <th>Manager</th>
+                        <th class="dash-table-actions-col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                        <tr>
+                            <td class="dash-table-id">{{ employee.id|stringformat:"06d" }}</td>
+                            <td class="dash-table-name">{{ employee.first_name }} {{ employee.last_name }}</td>
+                            <td class="dash-table-email">{{ employee.user.email|default:"—" }}</td>
+                            <td>Team 003</td>
+                            <td>Engineering</td>
+                            <td>Alfred Smith</td>
+                            <td>
+                                <div class="dash-table-actions">
+                                    <button type="button" class="dash-action-btn">View</button>
+                                    <button type="button" class="dash-action-icon" aria-label="Email {{ employee.first_name }}">
+                                        <i class="bi bi-envelope"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="dash-table-empty">No employees yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}
