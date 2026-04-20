@@ -237,6 +237,35 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
+/* Hide the default clear button on webkit/edge so we can use our own */
+.dash-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.dash-search-clear {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background-color: #e5e7eb;
+  color: var(--sh-muted);
+  text-decoration: none;
+  font-size: 0.7rem;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.dash-search-clear:hover {
+  background-color: #d1d5db;
+  color: var(--sh-text);
+}
+
 .dash-filter-btn {
   display: flex;
   align-items: center;
@@ -261,6 +290,16 @@
   outline: none;
   border-color: var(--sh-primary);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.dash-filter-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dash-filter-btn:disabled:hover {
+  background-color: var(--sh-surface);
+  color: var(--sh-muted);
 }
 
 /* ---- Employees table ---- */

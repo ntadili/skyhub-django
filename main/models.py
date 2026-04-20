@@ -11,6 +11,28 @@ class Profile(models.Model):
   first_name = models.CharField(max_length=20)
   last_name = models.CharField(max_length=20)
 
+  team = models.ForeignKey(
+    'Team',
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='members'
+  )
+  department = models.ForeignKey(
+    'Department',
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='members'
+  )
+  manager = models.ForeignKey(
+    'self',
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='reports'
+  )
+
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
 
