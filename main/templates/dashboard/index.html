@@ -7,6 +7,107 @@
     <link href="{% static 'main/css/dashboard.css' %}" rel="stylesheet">
 {% endblock %}
 
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            var modal = document.getElementById('employeeModal');
+            if (!modal) return;
+
+            modal.addEventListener('show.bs.modal', function (event) {
+                var trigger = event.relatedTarget;
+                if (!trigger) return;
+                var data = trigger.dataset;
+
+                modal.querySelectorAll('[data-field]').forEach(function (el) {
+                    var key = el.getAttribute('data-field');
+                    var value = data[key] || '';
+
+                    if (key === 'emailLink') {
+                        var hasEmail = value && value.trim();
+                        el.setAttribute('href', hasEmail ? 'mailto:' + value : '#');
+                        el.classList.toggle('disabled', !hasEmail);
+                    } else if (key === 'email') {
+                        el.textContent = value || '—';
+                    } else {
+                        el.textContent = value || '—';
+                    }
+                });
+            });
+        })();
+    </script>
+    <script>
+        (function () {
+            var canvas = document.getElementById('headcountChart');
+            if (!canvas || typeof Chart === 'undefined') return;
+
+            var labels = JSON.parse(document.getElementById('headcount-labels').textContent);
+            var series = JSON.parse(document.getElementById('headcount-series').textContent);
+
+            var datasets = series.map(function (s) {
+                return {
+                    label: s.label,
+                    data: s.data,
+                    borderColor: s.color,
+                    backgroundColor: s.color + '22',
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    borderWidth: 2,
+                    fill: false,
+                };
+            });
+
+            new Chart(canvas, {
+                type: 'line',
+                data: { labels: labels, datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 10,
+                                boxHeight: 10,
+                                usePointStyle: true,
+                                font: { size: 12 },
+                                color: '#4b5563',
+                                padding: 16,
+                            },
+                        },
+                        tooltip: {
+                            backgroundColor: '#111827',
+                            titleColor: '#f9fafb',
+                            bodyColor: '#f9fafb',
+                            padding: 10,
+                            cornerRadius: 8,
+                            displayColors: true,
+                        },
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#6b7280', font: { size: 11 } },
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                stepSize: 1,
+                                color: '#6b7280',
+                                font: { size: 11 },
+                            },
+                            grid: { color: '#e5e7eb', drawBorder: false },
+                        },
+                    },
+                },
+            });
+        })();
+    </script>
+{% endblock %}
+
 {% block content %}
     <header class="mb-4">
         <h1 class="dash-page-title">Dashboard</h1>
@@ -37,22 +138,6 @@
                         <span class="dash-status-count">{{ on_track_teams }} teams</span>
                     </span>
                 </div>
-
-                <h3 class="dash-card-subtitle">Critical (teams with active blockers)</h3>
-
-                <div class="dash-team-row">
-                    <span class="dash-team-tag">
-                        <span class="dash-status-dot dash-status-dot--critical"></span>
-                        <span class="dash-team-name">Core platform</span>
-                        <span class="dash-team-meta">11 employees</span>
-                    </span>
-                    <span class="dash-team-tag">
-                        <span class="dash-status-dot dash-status-dot--critical"></span>
-                        <span class="dash-team-name">Payments API</span>
-                        <span class="dash-team-meta">23 employees</span>
-                    </span>
-                    <span class="dash-team-more">+1 more</span>
-                </div>
             </section>
         </div>
 
@@ -62,26 +147,67 @@
                 <h2 class="dash-card-title">Your upcoming meetings</h2>
 
                 {% for meeting in upcoming_meetings %}
-                    <div class="dash-meeting">
-                        <div class="flex-grow-1" style="min-width: 0;">
-                            <div class="dash-meeting-title text-truncate">{{ meeting.title }}</div>
-                            <div class="dash-meeting-time">{{ meeting.date_time|date:"D, H:i" }}</div>
+                    {% with all_participants=meeting.participants.all %}
+                        <div class="dash-meeting">
+                            <div class="flex-grow-1" style="min-width: 0;">
+                                <div class="dash-meeting-title text-truncate">{{ meeting.title }}</div>
+                                <div class="dash-meeting-time">{{ meeting.date_time|date:"D, H:i" }}</div>
+                            </div>
+                            <div class="dash-meeting-right">
+                                <span class="dash-avatar-stack">
+                                    {% for p in all_participants|slice:":3" %}
+                                        <span class="dash-avatar">{{ p.first_name|first|upper }}</span>
+                                    {% endfor %}
+                                </span>
+                                {% with extra=all_participants|length|add:"-3" %}
+                                    {% if extra > 0 %}
+                                        <span class="dash-avatar-more">+{{ extra }} more</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
                         </div>
-                        <div class="dash-meeting-right">
-                            <span class="dash-avatar-stack">
-                                <span class="dash-avatar"></span>
-                                <span class="dash-avatar"></span>
-                                <span class="dash-avatar"></span>
-                            </span>
-                            <span class="dash-avatar-more">+{{ meeting.participants.count }} more</span>
-                        </div>
-                    </div>
+                    {% endwith %}
                 {% empty %}
                     <p class="dash-meeting-empty">No upcoming meetings.</p>
                 {% endfor %}
             </section>
         </div>
 
+    </div>
+
+    {# ===== Headcount chart + Total employees ===== #}
+    <div class="row g-3 mb-4">
+
+        <div class="col-12 col-xl-8">
+            <section class="dash-card h-100">
+                <h2 class="dash-card-title">Department headcount over time</h2>
+                <p class="dash-card-meta">Cumulative employees per department (last 6 months)</p>
+                <div class="dash-chart-wrap">
+                    <canvas id="headcountChart" aria-label="Department headcount chart" role="img"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <section class="dash-card dash-card--metric h-100">
+                <h2 class="dash-card-title">Total employees</h2>
+                <div class="dash-metric-value">{{ total_employees }}</div>
+                <p class="dash-metric-label">
+                    across {{ total_departments }} department{{ total_departments|pluralize }}
+                    · {{ total_teams }} team{{ total_teams|pluralize }}
+                </p>
+            </section>
+        </div>
+
+    </div>
+
+    {{ headcount_labels|json_script:"headcount-labels" }}
+    {{ headcount_series|json_script:"headcount-series" }}
+
+    {# ===== Section separator: Employees ===== #}
+    <div class="dash-section">
+        <h2 class="dash-section-title">Employees</h2>
+        <p class="dash-section-subtitle">Search the company directory by name, email, team, or department.</p>
     </div>
 
     {# ===== Search + Filter ===== #}
@@ -111,6 +237,63 @@
         </div>
     </form>
 
+    {# ===== Employee details modal (populated on click) ===== #}
+    <div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content emp-modal">
+                <div class="emp-modal-header">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="emp-modal-avatar" data-field="initial">?</div>
+                        <div>
+                            <h3 class="emp-modal-name" id="employeeModalTitle" data-field="name">—</h3>
+                            <p class="emp-modal-subtitle">
+                                <span data-field="team">—</span>
+                                <span class="emp-modal-sep">·</span>
+                                <span data-field="department">—</span>
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="emp-modal-body">
+                    <dl class="emp-modal-grid">
+                        <div class="emp-modal-field">
+                            <dt>Employee ID</dt>
+                            <dd data-field="empId">—</dd>
+                        </div>
+                        <div class="emp-modal-field">
+                            <dt>Email</dt>
+                            <dd data-field="email">—</dd>
+                        </div>
+                        <div class="emp-modal-field">
+                            <dt>Team</dt>
+                            <dd data-field="team">—</dd>
+                        </div>
+                        <div class="emp-modal-field">
+                            <dt>Department</dt>
+                            <dd data-field="department">—</dd>
+                        </div>
+                        <div class="emp-modal-field">
+                            <dt>Manager</dt>
+                            <dd data-field="manager">—</dd>
+                        </div>
+                        <div class="emp-modal-field">
+                            <dt>Member since</dt>
+                            <dd data-field="since">—</dd>
+                        </div>
+                    </dl>
+                </div>
+                <div class="emp-modal-footer">
+                    <button type="button" class="dash-action-btn" data-bs-dismiss="modal">Close</button>
+                    <a href="#" class="dash-action-btn dash-action-btn--primary emp-modal-email-btn" data-field="emailLink">
+                        <i class="bi bi-envelope"></i>
+                        Send email
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {# ===== Employees table ===== #}
     <div class="dash-table-card">
         <div class="table-responsive">
@@ -132,15 +315,36 @@
                             <td class="dash-table-id">{{ employee.id|stringformat:"06d" }}</td>
                             <td class="dash-table-name">{{ employee.first_name }} {{ employee.last_name }}</td>
                             <td class="dash-table-email">{{ employee.user.email|default:"—" }}</td>
-                            <td>Team 003</td>
-                            <td>Engineering</td>
-                            <td>Alfred Smith</td>
+                            <td>{{ employee.team|default:"—" }}</td>
+                            <td>{{ employee.department|default:"—" }}</td>
+                            <td>{% if employee.team %}{{ employee.team.leader_name|default:"—" }}{% else %}—{% endif %}</td>
                             <td>
                                 <div class="dash-table-actions">
-                                    <button type="button" class="dash-action-btn">View</button>
-                                    <button type="button" class="dash-action-icon" aria-label="Email {{ employee.first_name }}">
-                                        <i class="bi bi-envelope"></i>
+                                    <button type="button"
+                                            class="dash-action-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#employeeModal"
+                                            data-initial="{{ employee.first_name|first|upper }}"
+                                            data-emp-id="{{ employee.id|stringformat:"06d" }}"
+                                            data-name="{{ employee.first_name }} {{ employee.last_name }}"
+                                            data-email="{{ employee.user.email|default_if_none:'' }}"
+                                            data-team="{{ employee.team|default_if_none:'—' }}"
+                                            data-department="{{ employee.department|default_if_none:'—' }}"
+                                            data-manager="{% if employee.team.leader_name %}{{ employee.team.leader_name }}{% else %}—{% endif %}"
+                                            data-since="{{ employee.created_at|date:'M Y' }}">
+                                        View
                                     </button>
+                                    {% if employee.user.email %}
+                                        <a href="mailto:{{ employee.user.email }}"
+                                           class="dash-action-icon"
+                                           aria-label="Email {{ employee.first_name }}">
+                                            <i class="bi bi-envelope"></i>
+                                        </a>
+                                    {% else %}
+                                        <span class="dash-action-icon dash-action-icon--muted" aria-hidden="true">
+                                            <i class="bi bi-envelope"></i>
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>

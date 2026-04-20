@@ -38,6 +38,69 @@
   margin-bottom: 0.5rem;
 }
 
+.dash-card-meta {
+  font-size: 0.8rem;
+  color: var(--sh-muted);
+  margin-top: -0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ---- Section separator ---- */
+
+.dash-section {
+  border-top: 1px solid var(--sh-border);
+  padding-top: 1.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.dash-section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--sh-text);
+  letter-spacing: -0.01em;
+  margin: 0 0 0.25rem;
+}
+
+.dash-section-subtitle {
+  font-size: 0.85rem;
+  color: var(--sh-muted);
+  margin: 0;
+}
+
+/* ---- Headcount chart ---- */
+
+.dash-chart-wrap {
+  position: relative;
+  height: 260px;
+  width: 100%;
+}
+
+/* ---- Total employees metric card ---- */
+
+.dash-card--metric {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.dash-metric-value {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--sh-text);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-top: 0.25rem;
+}
+
+.dash-metric-label {
+  font-size: 0.85rem;
+  color: var(--sh-muted);
+  margin-top: 0.6rem;
+  margin-bottom: 0;
+}
+
 /* ---- Status pills (Critical / At risk / Clear) ---- */
 
 .dash-status-row {
@@ -170,16 +233,18 @@
 }
 
 .dash-avatar-stack .dash-avatar {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 9999px;
-  background-color: #d1d5db;
+  background-color: #e5e7eb;
   border: 2px solid var(--sh-surface);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 0.7rem;
+  font-weight: 600;
   color: var(--sh-muted);
+  text-transform: uppercase;
 }
 
 .dash-avatar-stack .dash-avatar + .dash-avatar {
@@ -411,4 +476,125 @@
   color: var(--sh-muted);
   padding: 2rem 1rem;
   font-size: 0.9rem;
+}
+
+.dash-action-icon--muted {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dash-action-btn--primary {
+  background-color: var(--sh-active);
+  color: #ffffff;
+  border-color: var(--sh-active);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dash-action-btn--primary:hover {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.dash-action-btn--primary.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ---- Employee details modal ---- */
+
+.emp-modal {
+  border: 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(17, 24, 39, 0.12);
+}
+
+.emp-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--sh-border);
+}
+
+.emp-modal-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 9999px;
+  background-color: #6b7280;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.emp-modal-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--sh-text);
+  letter-spacing: -0.01em;
+  margin: 0 0 0.15rem;
+}
+
+.emp-modal-subtitle {
+  font-size: 0.85rem;
+  color: var(--sh-muted);
+  margin: 0;
+}
+
+.emp-modal-sep {
+  margin: 0 0.35rem;
+  color: var(--sh-muted-soft);
+}
+
+.emp-modal-body {
+  padding: 1.5rem;
+}
+
+.emp-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem 1.5rem;
+  margin: 0;
+}
+
+.emp-modal-field dt {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--sh-muted-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.3rem;
+}
+
+.emp-modal-field dd {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--sh-text);
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.emp-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--sh-border);
+  background-color: #f9fafb;
+}
+
+@media (max-width: 576px) {
+  .emp-modal-grid {
+      grid-template-columns: 1fr;
+  }
 }

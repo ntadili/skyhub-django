@@ -25,13 +25,6 @@ class Profile(models.Model):
     blank=True,
     related_name='members'
   )
-  manager = models.ForeignKey(
-    'self',
-    on_delete=models.SET_NULL,
-    null=True,
-    blank=True,
-    related_name='reports'
-  )
 
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
@@ -72,6 +65,17 @@ class Team(models.Model):
 
   def __str__(self):
     return self.team_name
+
+  @property
+  def leader_name(self):
+    """Display name of the team leader, preferring their Profile over the raw User."""
+    if not self.team_leader:
+      return None
+    try:
+      p = self.team_leader.profile
+      return f"{p.first_name} {p.last_name}"
+    except Profile.DoesNotExist:
+      return self.team_leader.username
   
 
 
