@@ -121,3 +121,25 @@
     border: 1px solid var(--sh-border);
     border-radius: 0.5rem;
 }
+
+/* ----- Compose form ----- */
+
+.skyhub-compose-card {
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    max-width: 800px;
+}
+
+.skyhub-compose-card .form-label {
+    font-weight: 500;
+    color: var(--sh-text);
+    margin-bottom: 0.35rem;
+}
+
+.skyhub-compose-card .form-control:focus,
+.skyhub-compose-card .form-select:focus {
+    border-color: var(--sh-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
