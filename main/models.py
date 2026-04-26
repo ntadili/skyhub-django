@@ -110,3 +110,53 @@ class Meeting(models.Model):
 # ------------------------------------------------
 
 
+# ------------------------------------------------
+# MODELS CREATED BY KIRTAN (Messages module)
+
+class Message(models.Model):
+    """A message sent from one Profile to another.
+
+    Drafts are stored in the same table with is_draft=True. A draft may have
+    no recipient yet; when the user clicks Send, we validate the recipient
+    and flip is_draft to False. This avoids duplicating a separate Draft table.
+    """
+
+    STATUS_CHOICES = [
+        ('unread', 'Unread'),
+        ('read', 'Read'),
+    ]
+
+    sender = models.ForeignKey(
+        Profile,
+        on_delete=models.CASCADE,
+        related_name='sent_messages',
+    )
+    recipient = models.ForeignKey(
+        Profile,
+        on_delete=models.CASCADE,
+        related_name='received_messages',
+        null=True,   # drafts may not have a recipient yet
+        blank=True,
+    )
+    subject = models.CharField(max_length=255, blank=True)
+    body = models.TextField(blank=True)
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='unread',
+    )
+    is_draft = models.BooleanField(default=False)
+
+    timestamp = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        label = self.subject or '(No subject)'
+        if self.is_draft:
+            return f"[Draft] {label}"
+        return f"{label} — from {self.sender} to {self.recipient or '?'}"
+
+# ------------------------------------------------
