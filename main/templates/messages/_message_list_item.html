@@ -1,0 +1,44 @@
+{% comment %}
+Partial template: renders one row in a message list.
+Used by inbox.html, sent.html, drafts.html.
+
+Required context variables:
+    msg      - a Message instance
+    view     - one of 'inbox', 'sent', 'drafts'. Controls whether to display
+               the sender (inbox) or the recipient (sent/drafts), and whether
+               to show the unread visual treatment (inbox only).
+{% endcomment %}
+
+<a href="#"
+   class="skyhub-message-item {% if view == 'inbox' and msg.status == 'unread' %}skyhub-message-unread{% endif %}"
+   aria-label="Message {% if view == 'inbox' %}from {{ msg.sender.first_name }} {{ msg.sender.last_name }}{% else %}to {{ msg.recipient.first_name|default:'(no recipient)' }} {{ msg.recipient.last_name }}{% endif %}: {{ msg.subject|default:'(No subject)' }}">
+
+    <div class="d-flex justify-content-between align-items-start">
+        <div class="skyhub-message-from">
+            {# Unread dot only meaningful for inbox; sent/draft items don't have a read/unread status from the user's perspective #}
+            {% if view == 'inbox' and msg.status == 'unread' %}
+                <span class="skyhub-unread-dot" aria-hidden="true"></span>
+            {% endif %}
+
+            {% if view == 'inbox' %}
+                {{ msg.sender.first_name }} {{ msg.sender.last_name }}
+            {% else %}
+                {# Sent and Drafts both show the recipient. Drafts may have no recipient yet. #}
+                {% if msg.recipient %}
+                    To: {{ msg.recipient.first_name }} {{ msg.recipient.last_name }}
+                {% else %}
+                    <span class="text-muted">No recipient</span>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="skyhub-message-date text-muted small">
+            {{ msg.timestamp|date:"M j, g:i A" }}
+        </div>
+    </div>
+    <div class="skyhub-message-subject">
+        {{ msg.subject|default:"(No subject)" }}
+    </div>
+    <div class="skyhub-message-preview text-muted small">
+        {{ msg.body|default:""|truncatechars:120 }}
+    </div>
+</a>

@@ -59,27 +59,7 @@
 <div class="skyhub-messages-list">
     {% if messages_list %}
         {% for msg in messages_list %}
-        <a href="#"
-           class="skyhub-message-item {% if msg.status == 'unread' %}skyhub-message-unread{% endif %}"
-           aria-label="Message from {{ msg.sender.first_name }} {{ msg.sender.last_name }}: {{ msg.subject|default:'(No subject)' }}">
-            <div class="d-flex justify-content-between align-items-start">
-                <div class="skyhub-message-from">
-                    {% if msg.status == 'unread' %}
-                        <span class="skyhub-unread-dot" aria-hidden="true"></span>
-                    {% endif %}
-                    {{ msg.sender.first_name }} {{ msg.sender.last_name }}
-                </div>
-                <div class="skyhub-message-date text-muted small">
-                    {{ msg.timestamp|date:"M j, g:i A" }}
-                </div>
-            </div>
-            <div class="skyhub-message-subject">
-                {{ msg.subject|default:"(No subject)" }}
-            </div>
-            <div class="skyhub-message-preview text-muted small">
-                {{ msg.body|truncatechars:120 }}
-            </div>
-        </a>
+            {% include "messages/_message_list_item.html" with view='inbox' %}
         {% endfor %}
     {% else %}
         <div class="skyhub-empty-state text-center py-5">
