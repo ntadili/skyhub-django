@@ -156,3 +156,33 @@ def compose(request):
         'form_data': form_data,
     }
     return render(request, 'messages/compose.html', context)
+
+# ---------- UC-M4: View Sent ----------
+
+@login_required
+def sent(request):
+    """Display all non-draft messages where the current user is the sender.
+
+    Mirrors the inbox view but filters by sender instead of recipient and
+    excludes drafts (drafts have their own view in UC-M5).
+
+    select_related('recipient') pre-fetches the recipient profile in one
+    SQL query, avoiding the N+1 query problem when rendering the list —
+    same optimisation pattern used in inbox().
+    """
+    my_profile = _get_current_profile(request)
+
+    if my_profile is None:
+        messages_list = []
+    else:
+        messages_list = (
+            Message.objects
+            .filter(sender=my_profile, is_draft=False)
+            .select_related('recipient')
+        )
+
+    context = {
+        'messages_list': messages_list,
+        'has_profile': my_profile is not None,
+    }
+    return render(request, 'messages/sent.html', context)
