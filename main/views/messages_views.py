@@ -59,23 +59,25 @@ def inbox(request):
     return render(request, 'messages/inbox.html', context)
 
 
-# ---------- UC-M1: Send Message  /  UC-M2: Save Draft ----------
+# ---------- UC-M1: Send Message  /  UC-M2: Save Draft  /  UC-M5 (edit draft) ----------
 
 @login_required
 def compose(request):
-    """Compose a new message and either send it or save it as a draft.
+    """Compose a new message, send it, save it as a draft, or edit an existing draft.
 
-    GET  -> empty form.
-    POST -> validate and create a Message. The `action` field on the submitted
-            form tells us whether this is a Send (action=send) or Save Draft
-            (action=save_draft). Validation rules differ between the two.
+    GET  -> empty form, OR pre-populated form when ?draft=<id> is provided.
+    POST -> validate and either:
+              - create a new Message (when not editing a draft), OR
+              - update the existing draft Message (when editing).
+            The `action` field on the submitted form tells us whether this is
+            a Send (action=send) or Save Draft (action=save_draft).
 
-    Covers test cases TC-M1-01 .. TC-M1-04 and TC-M2-01 .. TC-M2-02.
+    Covers test cases TC-M1-01..04, TC-M2-01..02, and TC-M5-03 (edit draft).
 
     Note on the `errors` dict: keys are field names ('recipient', 'subject',
-    'body') plus a catch-all key 'form_error' for errors that don't attach to
-    a specific field. We avoid Django's convention of '__all__' because
-    Django's template language disallows variable names starting with '_'.
+    'body') plus a catch-all key 'form_error'. We avoid Django's '__all__'
+    convention because Django's template language disallows variable names
+    starting with '_'.
     """
     my_profile = _get_current_profile(request)
 
@@ -93,8 +95,34 @@ def compose(request):
         .order_by('first_name', 'last_name')
     )
 
+    # --- Are we editing an existing draft? ---
+    # The ?draft=<id> query parameter triggers edit mode. We look it up
+    # carefully: must exist, must be ours, must actually be a draft.
+    # Any failure of those checks -> redirect to drafts list with an error.
+    editing_draft = None
+    draft_id = request.GET.get('draft') or request.POST.get('draft_id')
+    if draft_id:
+        try:
+            editing_draft = Message.objects.get(
+                pk=draft_id,
+                sender=my_profile,
+                is_draft=True,
+            )
+        except Message.DoesNotExist:
+            django_messages.error(request, "Draft not found.")
+            return redirect('messages_drafts')
+
     errors = {}
-    form_data = {'recipient': '', 'subject': '', 'body': ''}
+
+    # Decide initial form values: pre-populate from draft if editing, else empty.
+    if editing_draft and request.method == 'GET':
+        form_data = {
+            'recipient': str(editing_draft.recipient.pk) if editing_draft.recipient else '',
+            'subject': editing_draft.subject,
+            'body': editing_draft.body,
+        }
+    else:
+        form_data = {'recipient': '', 'subject': '', 'body': ''}
 
     if request.method == 'POST':
         recipient_id = request.POST.get('recipient', '').strip()
@@ -116,8 +144,6 @@ def compose(request):
             if not body:
                 errors['body'] = 'Message body is required.'
         elif action == 'save_draft':
-            # Draft allows a blank subject; but there must be SOME content
-            # to save (otherwise there's nothing meaningful to persist).
             if not subject and not body:
                 errors['form_error'] = 'Write a subject or body before saving as draft.'
         else:
@@ -134,26 +160,44 @@ def compose(request):
             except Profile.DoesNotExist:
                 errors['recipient'] = 'Selected recipient does not exist.'
 
-        # --- on success, create the Message and redirect ---
+        # --- on success, create OR update ---
         if not errors:
             is_draft = (action == 'save_draft')
-            Message.objects.create(
-                sender=my_profile,
-                recipient=recipient,  # may be None for drafts
-                subject=subject,
-                body=body,
-                is_draft=is_draft,
-            )
-            if is_draft:
-                django_messages.success(request, 'Draft saved.')
+
+            if editing_draft:
+                # Update the existing draft row in place.
+                editing_draft.recipient = recipient
+                editing_draft.subject = subject
+                editing_draft.body = body
+                editing_draft.is_draft = is_draft
+                editing_draft.save()  # auto_now field 'updated_at' refreshes here
+                if is_draft:
+                    django_messages.success(request, 'Draft updated.')
+                    return redirect('messages_drafts')
+                else:
+                    django_messages.success(request, 'Message sent.')
+                    return redirect('messages')
             else:
-                django_messages.success(request, 'Message sent.')
-            return redirect('messages')
+                # Brand new message.
+                Message.objects.create(
+                    sender=my_profile,
+                    recipient=recipient,
+                    subject=subject,
+                    body=body,
+                    is_draft=is_draft,
+                )
+                if is_draft:
+                    django_messages.success(request, 'Draft saved.')
+                    return redirect('messages_drafts')
+                else:
+                    django_messages.success(request, 'Message sent.')
+                    return redirect('messages')
 
     context = {
         'recipients': recipients,
         'errors': errors,
         'form_data': form_data,
+        'editing_draft': editing_draft,
     }
     return render(request, 'messages/compose.html', context)
 
@@ -186,3 +230,68 @@ def sent(request):
         'has_profile': my_profile is not None,
     }
     return render(request, 'messages/sent.html', context)
+
+# ---------- UC-M5: View Drafts ----------
+
+@login_required
+def drafts(request):
+    """Display all drafts authored by the current user.
+
+    Drafts are messages with is_draft=True. They live in the same Message
+    table as sent messages but are filtered out of inbox/sent views and
+    surfaced here. Each draft is editable (-> compose with ?draft=<id>)
+    and deletable (-> delete_draft view).
+
+    select_related('recipient') pre-fetches the recipient profile in one
+    SQL query. A draft may have no recipient yet (recipient is nullable),
+    in which case the partial template handles the None case explicitly.
+    """
+    my_profile = _get_current_profile(request)
+
+    if my_profile is None:
+        messages_list = []
+    else:
+        messages_list = (
+            Message.objects
+            .filter(sender=my_profile, is_draft=True)
+            .select_related('recipient')
+        )
+
+    context = {
+        'messages_list': messages_list,
+        'has_profile': my_profile is not None,
+    }
+    return render(request, 'messages/drafts.html', context)
+
+@login_required
+def delete_draft(request, pk):
+    """Delete a draft. Restricted to POST and to the draft's owner.
+
+    POST-only because deletes shouldn't happen via GET — that would let an
+    attacker delete drafts by tricking the user into visiting a URL (or by
+    a browser pre-fetching the link). POST requires a form submission with
+    a valid CSRF token, mitigating both attacks.
+
+    The lookup also verifies sender=request.user.profile and is_draft=True;
+    a missing-or-not-yours-or-not-a-draft row 404s rather than leaking which
+    of those was wrong.
+    """
+    if request.method != 'POST':
+        # Reject non-POST requests with a 405 Method Not Allowed.
+        from django.http import HttpResponseNotAllowed
+        return HttpResponseNotAllowed(['POST'])
+
+    my_profile = _get_current_profile(request)
+    if my_profile is None:
+        django_messages.warning(request, "Your account has no Profile yet.")
+        return redirect('messages_drafts')
+
+    try:
+        draft = Message.objects.get(pk=pk, sender=my_profile, is_draft=True)
+    except Message.DoesNotExist:
+        django_messages.error(request, "Draft not found.")
+        return redirect('messages_drafts')
+
+    draft.delete()
+    django_messages.success(request, 'Draft deleted.')
+    return redirect('messages_drafts')
