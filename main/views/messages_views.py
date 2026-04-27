@@ -30,7 +30,7 @@ def _get_current_profile(request):
 
 # ---------- UC-M3: View Inbox ----------
 
-@login_required(login_url='/admin/login/')
+@login_required
 def inbox(request):
     """Display all non-draft messages where the current user is the recipient.
 
@@ -61,7 +61,7 @@ def inbox(request):
 
 # ---------- UC-M1: Send Message  /  UC-M2: Save Draft ----------
 
-@login_required(login_url='/admin/login/')
+@login_required
 def compose(request):
     """Compose a new message and either send it or save it as a draft.
 
