@@ -27,6 +27,7 @@ urlpatterns = [
     path('organisation/', include('main.urls.organisation_urls')),
     path('messages/', include('main.urls.messages_urls')),
     path('schedule/', include('main.urls.schedule_urls')),
+    path('reports/', include('main.urls.reports_urls')),
 ]
 
 
