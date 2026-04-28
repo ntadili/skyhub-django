@@ -49,7 +49,7 @@ Required context variables:
         </form>
     </div>
 {% else %}
-    <a href="#"
+    <a href="{% url 'messages_read' msg.pk %}{% if view == 'sent' %}?from=sent{% endif %}"
        class="skyhub-message-item {% if view == 'inbox' and msg.status == 'unread' %}skyhub-message-unread{% endif %}"
        aria-label="Message {% if view == 'inbox' %}from {{ msg.sender.first_name }} {{ msg.sender.last_name }}{% else %}to {{ msg.recipient.first_name|default:'(no recipient)' }} {{ msg.recipient.last_name }}{% endif %}: {{ msg.subject|default:'(No subject)' }}">
 

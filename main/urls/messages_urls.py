@@ -8,6 +8,7 @@ Routes:
     /messages/sent/                  -> Sent messages list (UC-M4)
     /messages/drafts/                -> Drafts list (UC-M5)
     /messages/drafts/<id>/delete/    -> Delete a draft (UC-M5)
+    /messages/<id>/                  -> Read a single message (UC-M6)
 """
 
 from django.urls import path
@@ -17,6 +18,7 @@ from main.views.messages_views import (
     sent,
     drafts,
     delete_draft,
+    read_message,
 )
 
 urlpatterns = [
@@ -25,4 +27,5 @@ urlpatterns = [
     path('sent/', sent, name='messages_sent'),
     path('drafts/', drafts, name='messages_drafts'),
     path('drafts/<int:pk>/delete/', delete_draft, name='messages_delete_draft'),
+    path('<int:pk>/', read_message, name='messages_read'),
 ]

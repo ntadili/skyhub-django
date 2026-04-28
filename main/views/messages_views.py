@@ -295,3 +295,59 @@ def delete_draft(request, pk):
     draft.delete()
     django_messages.success(request, 'Draft deleted.')
     return redirect('messages_drafts')
+
+# ---------- UC-M6: Read Message ----------
+
+@login_required
+def read_message(request, pk):
+    """Display a single non-draft message in full.
+
+    Visibility: only the sender or the recipient can view a given message.
+    Anyone else gets a 404 — same response as 'doesn't exist' so we don't
+    leak which messages exist (information disclosure prevention).
+
+    Drafts (is_draft=True) also 404 here — they have their own UI in
+    /messages/drafts/ and are edited via /messages/compose/?draft=<id>.
+
+    Unread -> read flip: when the *recipient* opens an unread message,
+    status flips to 'read'. The flip only fires when:
+      - the viewer is the recipient (not the sender viewing from Sent), AND
+      - status is currently 'unread'.
+    Sender opens never flip status. Updates use update_fields=['status']
+    so we don't accidentally bump auto_now fields like updated_at.
+    """
+    my_profile = _get_current_profile(request)
+
+    if my_profile is None:
+        django_messages.warning(request, "Your account has no Profile yet.")
+        return redirect('messages')
+
+    # Combined visibility + existence check. Q allows OR-ing filter clauses.
+    from django.db.models import Q
+    try:
+        msg = Message.objects.select_related('sender', 'recipient').get(
+            Q(sender=my_profile) | Q(recipient=my_profile),
+            pk=pk,
+            is_draft=False,
+        )
+    except Message.DoesNotExist:
+        from django.http import Http404
+        raise Http404("Message not found.")
+
+    # Unread -> read flip (recipient only, on first open)
+    if msg.recipient_id == my_profile.pk and msg.status == 'unread':
+        msg.status = 'read'
+        msg.save(update_fields=['status'])
+
+    # Where should the back link go? Default Inbox; respect ?from=sent.
+    came_from = request.GET.get('from', 'inbox')
+    if came_from not in ('inbox', 'sent'):
+        came_from = 'inbox'
+
+    context = {
+        'msg': msg,
+        'is_recipient': msg.recipient_id == my_profile.pk,
+        'is_sender': msg.sender_id == my_profile.pk,
+        'came_from': came_from,
+    }
+    return render(request, 'messages/read.html', context)
