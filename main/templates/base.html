@@ -94,10 +94,12 @@
 
                         <div class="skyhub-nav-group-label">Admin</div>
 
-                        <span class="nav-link disabled" aria-disabled="true">
+                        <a class="nav-link {% if name == 'reports' %}active{% endif %}"
+                           href="{% url 'reports' %}"
+                           {% if name == 'reports' %}aria-current="page"{% endif %}>
                             <span class="skyhub-nav-icon"><i class="bi bi-file-earmark-bar-graph"></i></span>
                             Reports
-                        </span>
+                        </a>
                         <span class="nav-link disabled" aria-disabled="true">
                             <span class="skyhub-nav-icon"><i class="bi bi-gear"></i></span>
                             Settings
