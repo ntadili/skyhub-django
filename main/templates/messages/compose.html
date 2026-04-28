@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}New Message — Sky Hub{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'main/css/messages.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+{# Flash messages — e.g. "Draft saved." #}
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<div class="skyhub-messages-header d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-0">New Message</h1>
+        <p class="text-muted mb-0">Compose a new message to a team member</p>
+    </div>
+    <a href="{% url 'messages' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-x-lg me-1"></i>
+        Cancel
+    </a>
+</div>
+
+{% if errors.form_error %}
+<div class="alert alert-danger" role="alert">{{ errors.form_error }}</div>
+{% endif %}
+
+<div class="skyhub-compose-card">
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="id_recipient" class="form-label">
+                To <span class="text-muted">(required to send)</span>
+            </label>
+            <select id="id_recipient" name="recipient"
+                    class="form-select {% if errors.recipient %}is-invalid{% endif %}">
+                <option value="">Select a recipient...</option>
+                {% for profile in recipients %}
+                <option value="{{ profile.pk }}"
+                        {% if form_data.recipient == profile.pk|stringformat:"s" %}selected{% endif %}>
+                    {{ profile.first_name }} {{ profile.last_name }}{% if profile.team %} — {{ profile.team.team_name }}{% endif %}
+                </option>
+                {% endfor %}
+            </select>
+            {% if errors.recipient %}
+                <div class="invalid-feedback">{{ errors.recipient }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_subject" class="form-label">Subject</label>
+            <input type="text" id="id_subject" name="subject"
+                   class="form-control {% if errors.subject %}is-invalid{% endif %}"
+                   value="{{ form_data.subject }}"
+                   maxlength="255"
+                   placeholder="Optional">
+            {% if errors.subject %}
+                <div class="invalid-feedback">{{ errors.subject }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-4">
+            <label for="id_body" class="form-label">
+                Message <span class="text-muted">(required to send)</span>
+            </label>
+            <textarea id="id_body" name="body"
+                      class="form-control {% if errors.body %}is-invalid{% endif %}"
+                      rows="10"
+                      placeholder="Write your message here...">{{ form_data.body }}</textarea>
+            {% if errors.body %}
+                <div class="invalid-feedback">{{ errors.body }}</div>
+            {% endif %}
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+            <button type="submit" name="action" value="send" class="btn btn-primary">
+                <i class="bi bi-send me-1"></i>
+                Send Message
+            </button>
+            <button type="submit" name="action" value="save_draft" class="btn btn-outline-secondary">
+                <i class="bi bi-file-earmark me-1"></i>
+                Save as Draft
+            </button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

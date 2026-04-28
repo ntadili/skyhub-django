@@ -1,0 +1,272 @@
+/* ===== Sky Hub – base layout ===== */
+
+:root {
+  --sh-bg: #f4f5f7;
+  --sh-surface: #ffffff;
+  --sh-border: #e5e7eb;
+  --sh-text: #111827;
+  --sh-muted: #4b5563;
+  --sh-muted-soft: #9ca3af;
+  --sh-active: #111827;
+  --sh-hover: #f3f4f6;
+  --sh-primary: #2563eb;
+  --sh-danger: #dc2626;
+}
+
+body {
+  background-color: var(--sh-bg);
+  color: var(--sh-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== Mobile top bar ===== */
+
+.skyhub-topbar {
+  height: 56px;
+}
+
+.skyhub-topbar .skyhub-topbar-toggle {
+  border: none;
+  background: transparent;
+  color: var(--sh-text);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color .15s ease;
+}
+
+.skyhub-topbar .skyhub-topbar-toggle:hover {
+  background-color: var(--sh-hover);
+}
+
+.skyhub-topbar .skyhub-topbar-toggle:focus-visible {
+  outline: 2px solid var(--sh-primary);
+  outline-offset: 2px;
+}
+
+/* ===== Sidebar shell ===== */
+
+.skyhub-sidebar {
+    width: 232px;
+    flex: 0 0 232px;
+    background-color: var(--sh-surface);
+}
+
+@media (min-width: 768px) {
+  .skyhub-sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      box-shadow: 1px 0 0 rgba(17, 24, 39, 0.05);
+  }
+    /* Override Bootstrap's responsive offcanvas collapse which sets
+       flex-grow: 0 and padding: 0 on .offcanvas-body at md+. */
+    .skyhub-sidebar .offcanvas-body {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        padding: 1.25rem 0.25rem;
+        overflow-y: auto;
+        background-color: var(--sh-surface);
+    }
+}
+
+.skyhub-sidebar .offcanvas-body {
+    padding: 1.25rem 0.25rem;
+}
+
+/* Brand */
+.skyhub-brand {
+    gap: 0.5rem;
+    letter-spacing: -0.01em;
+}
+
+.skyhub-brand-wrap {
+    /* The logo PNG has transparent padding baked in, so negative insets
+       visually tighten the header without cropping the image. */
+    margin-top: -1.5rem;
+    margin-bottom: -1.5rem;
+    padding-left: 0;
+}
+
+.skyhub-brand-link {
+    color: inherit;
+    text-decoration: none;
+    border-radius: 0.5rem;
+}
+
+.skyhub-brand-link:focus-visible {
+    outline: 2px solid var(--sh-primary);
+    outline-offset: 2px;
+}
+
+.skyhub-brand-logo {
+    display: block;
+    max-height: 40px;
+    width: auto;
+}
+
+.skyhub-brand-logo-lg {
+    display: block;
+    width: 95%;
+    max-width: none;
+    height: auto;
+    /* Pull the logo slightly left to absorb the PNG's baked-in
+       transparent padding, so the cloud visually aligns left. */
+    margin-left: -1.25rem;
+}
+
+/* Full-width horizontal divider that breaks out of the sidebar padding */
+.skyhub-divider {
+    height: 1px;
+    background-color: var(--sh-border);
+    border: 0;
+    opacity: 1;
+    margin: 0 -0.25rem;
+}
+
+/* ===== Nav ===== */
+
+.skyhub-nav {
+  gap: 2px;
+}
+
+.skyhub-nav-group-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--sh-muted-soft);
+  text-transform: uppercase;
+  padding: 0 0.75rem;
+  margin: 1rem 0 0.35rem;
+}
+
+.skyhub-nav-group-label:first-child {
+  margin-top: 0.25rem;
+}
+
+.skyhub-nav .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--sh-muted);
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.skyhub-nav .nav-link:not(.disabled):not(.active):hover {
+  background-color: rgba(17, 24, 39, 0.04);
+  color: var(--sh-text);
+}
+
+.skyhub-nav .nav-link:focus-visible {
+  outline: 2px solid var(--sh-primary);
+  outline-offset: 2px;
+}
+
+.skyhub-nav .nav-link.active,
+.skyhub-nav .nav-link.active:hover,
+.skyhub-nav .nav-link.active:focus {
+  background-color: var(--sh-active);
+  color: #ffffff;
+}
+
+.skyhub-nav .nav-link.active .skyhub-nav-icon {
+  color: #ffffff;
+}
+
+.skyhub-nav .nav-link.disabled {
+  color: var(--sh-muted);
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.skyhub-nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.skyhub-nav-icon i {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ===== Footer ===== */
+
+.skyhub-user {
+  min-width: 0;
+}
+
+.skyhub-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    background-color: #6b7280;
+    color: #ffffff;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+}
+
+.skyhub-user-email {
+  font-size: 0.85rem;
+  color: var(--sh-muted);
+  min-width: 0;
+}
+
+.skyhub-presence-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background-color: #16a34a;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px var(--sh-surface);
+}
+
+.skyhub-logout {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--sh-danger);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  text-align: left;
+  transition: background-color .15s ease;
+}
+
+.skyhub-logout:not(:disabled):hover {
+  background-color: rgba(220, 38, 38, 0.08);
+}
+
+.skyhub-logout:focus-visible {
+  outline: 2px solid var(--sh-danger);
+  outline-offset: 2px;
+}
+
+.skyhub-logout:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ===== Main content ===== */
+
+.skyhub-main {
+  min-width: 0;
+  overflow-x: hidden;
+}

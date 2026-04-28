@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Sky Hub{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="{% static 'main/css/base.css' %}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {# Mobile top bar – only visible below md #}
+    <nav class="skyhub-topbar navbar bg-white border-bottom d-md-none px-3 py-2 d-flex align-items-center justify-content-between">
+        <button type="button"
+                class="skyhub-topbar-toggle"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#skyhubSidebar"
+                aria-controls="skyhubSidebar"
+                aria-label="Open navigation">
+            <i class="bi bi-list fs-3"></i>
+        </button>
+        <a href="{% url 'dashboard' %}" class="skyhub-brand-link d-flex align-items-center" aria-label="Sky Hub — go to Dashboard">
+            <img src="{% static 'main/images/logo.png' %}" alt="Sky Hub" class="skyhub-brand-logo">
+        </a>
+        <span style="width: 40px;" aria-hidden="true"></span>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row min-vh-100 flex-nowrap g-0">
+            <aside id="skyhubSidebar"
+                   class="skyhub-sidebar offcanvas-md offcanvas-start d-md-flex flex-md-column"
+                   tabindex="-1"
+                   aria-labelledby="skyhubSidebarLabel">
+
+                {# Offcanvas header (mobile only) #}
+                <div class="offcanvas-header d-md-none border-bottom">
+                    <a id="skyhubSidebarLabel" href="{% url 'dashboard' %}" class="skyhub-brand-link d-flex align-items-center" aria-label="Sky Hub — go to Dashboard">
+                        <img src="{% static 'main/images/logo.png' %}" alt="Sky Hub" class="skyhub-brand-logo">
+                    </a>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="offcanvas"
+                            data-bs-target="#skyhubSidebar"
+                            aria-label="Close navigation"></button>
+                </div>
+
+                <div class="offcanvas-body d-flex flex-column">
+                    {# Brand (desktop only) #}
+                    <a href="{% url 'dashboard' %}" class="skyhub-brand-link skyhub-brand-wrap d-none d-md-flex align-items-center justify-content-start" aria-label="Sky Hub — go to Dashboard">
+                        <img src="{% static 'main/images/logo.png' %}" alt="Sky Hub" class="skyhub-brand-logo-lg">
+                    </a>
+                    <hr class="skyhub-divider d-none d-md-block mb-3">
+
+                    {% with name=request.resolver_match.url_name %}
+                    <nav class="skyhub-nav nav flex-column" aria-label="Main navigation">
+
+                        <div class="skyhub-nav-group-label">Workspace</div>
+
+                        <a class="nav-link {% if name == 'dashboard' %}active{% endif %}"
+                           href="{% url 'dashboard' %}"
+                           {% if name == 'dashboard' %}aria-current="page"{% endif %}>
+                            <span class="skyhub-nav-icon"><i class="bi bi-speedometer2"></i></span>
+                            Dashboard
+                        </a>
+                        <a class="nav-link {% if name == 'organisation' %}active{% endif %}"
+                           href="{% url 'organisation' %}"
+                           {% if name == 'organisation' %}aria-current="page"{% endif %}>
+                            <span class="skyhub-nav-icon"><i class="bi bi-diagram-3"></i></span>
+                            Organisation
+                        </a>
+                        <a class="nav-link {% if name == 'teams' %}active{% endif %}"
+                           href="{% url 'teams' %}"
+                           {% if name == 'teams' %}aria-current="page"{% endif %}>
+                            <span class="skyhub-nav-icon"><i class="bi bi-people"></i></span>
+                            Teams
+                        </a>
+
+                        <div class="skyhub-nav-group-label">Communication</div>
+
+                        <a class="nav-link {% if name == 'schedule' %}active{% endif %}"
+                           href="{% url 'schedule' %}"
+                           {% if name == 'schedule' %}aria-current="page"{% endif %}>
+                            <span class="skyhub-nav-icon"><i class="bi bi-calendar-event"></i></span>
+                            Meetings
+                        </a>
+                        <a class="nav-link {% if name == 'messages' %}active{% endif %}"
+                           href="{% url 'messages' %}"
+                           {% if name == 'messages' %}aria-current="page"{% endif %}>
+                            <span class="skyhub-nav-icon"><i class="bi bi-chat-dots"></i></span>
+                            Messages
+                        </a>
+
+                        <div class="skyhub-nav-group-label">Admin</div>
+
+                        <span class="nav-link disabled" aria-disabled="true">
+                            <span class="skyhub-nav-icon"><i class="bi bi-file-earmark-bar-graph"></i></span>
+                            Reports
+                        </span>
+                        <span class="nav-link disabled" aria-disabled="true">
+                            <span class="skyhub-nav-icon"><i class="bi bi-gear"></i></span>
+                            Settings
+                        </span>
+                    </nav>
+                    {% endwith %}
+
+                    {# Footer – user + logout #}
+                    {% if request.user.is_authenticated %}
+                        {% with profile=request.user.profile %}
+                        <div class="mt-auto">
+                            <hr class="skyhub-divider mb-2">
+                            <div class="skyhub-user d-flex align-items-center gap-2 mb-2">
+                                <div class="skyhub-avatar" aria-hidden="true">
+                                    {% if profile %}{{ profile.first_name|first|upper }}{% else %}{{ request.user.username|first|upper }}{% endif %}
+                                </div>
+                                <div class="flex-grow-1" style="min-width: 0;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="skyhub-user-email text-truncate" title="{{ request.user.username }}">{{ request.user.username }}</span>
+                                        <span class="skyhub-presence-dot" aria-label="Online"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="skyhub-divider mb-3">
+                            <form method="post" action="{% url 'logout' %}" class="m-0">
+                                {% csrf_token %}
+                                <button type="submit" class="skyhub-logout">
+                                    <span class="skyhub-nav-icon"><i class="bi bi-box-arrow-right"></i></span>
+                                    Log out
+                                </button>
+                            </form>
+                        </div>
+                        {% endwith %}
+                    {% endif %}
+                </div>
+            </aside>
+
+            <main class="skyhub-main col min-vh-100 p-4">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
