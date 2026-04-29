@@ -1,0 +1,177 @@
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        
+        .form-section {
+            background-color: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            flex: 2;
+        }
+
+        .divider {
+            border: 0;
+            border-top: 1px solid #e1e4e8;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #7a828a;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 8px;
+            color: #7a828a;
+            font-size: 14px;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            font-family: inherit; 
+        }
+
+        .meeting-time-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .platform-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            position: relative;
+        }
+
+        .platform-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            border: none;
+            color: white;
+            background-color: #2b3a4a;
+            transition: 0.2s;
+        }
+
+        .platform-btn.active { background-color: #3d71f5 !important; }
+
+        #platformSelection {
+            opacity: 0; position: absolute; width: 0; height: 0; pointer-events: none;
+        }
+
+        /* Participants */
+        .participants-row { display: flex; gap: 8px; align-items: center; }
+        .search-input {
+            flex-grow: 1; display: flex; align-items: center; padding: 12px;
+            border: 1px solid #e1e4e8; border-radius: 8px;
+        }
+        .search-input input { border: none; font-size: 14px; width: 100%; outline: none; }
+
+        .add-btn {
+            padding: 12px 24px; background-color: #2b3a4a; border: none;
+            border-radius: 8px; color: white; cursor: pointer;
+        }
+
+        .participant-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .participant-chip {
+            background: #eef2f7; padding: 6px 12px; border-radius: 20px;
+            font-size: 12px; color: #2b3a4a; display: flex; align-items: center; gap: 8px;
+        }
+        .remove-participant { cursor: pointer; color: #8b8b8b; font-weight: bold; }
+
+        .message-box { height: 80px; resize: none; }
+
+        /* Repeat Buttons */
+        .repeat-options { display: flex; gap: 24px; margin-top: 10px; }
+        .radio-container {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 14px; color: #7a828a; cursor: pointer; position: relative;
+        }
+        .radio-container input { position: absolute; opacity: 0; cursor: pointer; }
+        .radio-custom {
+            width: 18px; height: 18px; border: 2px solid #e1e4e8;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .radio-container input:checked ~ .radio-custom { border-color: #3d71f5; }
+        .radio-container input:checked ~ .radio-custom::after {
+            content: ''; width: 10px; height: 10px; background-color: #3d71f5; border-radius: 50%;
+        }
+
+        .footer-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; }
+        .btn { padding: 10px 16px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; }
+        .btn-cancel { background-color: transparent; color: #7a828a; }
+        .btn-schedule { background-color: #3d71f5; color: white; }
+
+        /* Sidebar Styling */
+        .sidebar-section { flex: 1; padding: 24px 0 24px 24px; }
+        .sidebar-title { font-size: 16px; font-weight: 700; color: #acacac; margin-bottom: 20px; }
+        .meeting-item {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px; background: white; padding: 12px; border-radius: 12px;
+            cursor: pointer; transition: transform 0.1s; border: 1px solid transparent;
+        }
+        .meeting-item:hover { transform: translateY(-2px); border-color: #3d71f5; }
+
+        .meeting-meta { display: flex; align-items: center; gap: 12px; }
+        .icon-box { width: 44px; height: 44px; border-radius: 12px; }
+        .icon-box.blue   { background-color: #3d71f5; }
+        .icon-box.green  { background-color: #3cc26a; }
+        .icon-box.orange { background-color: #f7703a; }
+        .icon-box.purple { background-color: #aa3cfc; }
+
+        .meeting-details { display: flex; flex-direction: column; }
+        .meeting-name { font-size: 14px; font-weight: 700; color: #2b3a4a; }
+        .meeting-platform, .meeting-participants { font-size: 12px; color: #7a828a; }
+        .meeting-time { font-size: 14px; font-weight: 700; color: #2b3a4a; }
+
+        /* Modal Styling */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); display: none;
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; padding: 32px; border-radius: 16px; width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative;
+        }
+        .modal-header { font-size: 20px; font-weight: 700; color: #2b3a4a; margin-bottom: 16px; }
+        .modal-body p { font-size: 14px; color: #7a828a; margin: 8px 0; }
+        .modal-body strong { color: #2b3a4a; }
+        .close-modal {
+            position: absolute; top: 15px; right: 15px; font-size: 24px;
+            cursor: pointer; color: #acacac; border: none; background: none;
+        }
+        
+        .btn-cancel-meeting {
+            width: 100%; margin-top: 20px; background-color: #6f8090; color: white;
+            padding: 12px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700;
+        }
