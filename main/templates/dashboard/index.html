@@ -106,76 +106,121 @@
             });
         })();
     </script>
+    <script>
+        (function () {
+            var menu = document.querySelector('.dash-filter-menu');
+            var toggle = document.querySelector('.dash-filter-toggle');
+            if (!menu || !toggle) return;
+
+            function showStep(name) {
+                menu.querySelectorAll('.dash-filter-step').forEach(function (s) {
+                    s.classList.toggle('d-none', s.dataset.step !== name);
+                });
+            }
+
+            menu.querySelectorAll('[data-category-target]').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    showStep(btn.dataset.categoryTarget);
+                });
+            });
+
+            menu.querySelectorAll('.dash-filter-back').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    showStep('category');
+                });
+            });
+
+            // Reset to step 1 every time the menu opens
+            toggle.addEventListener('click', function () {
+                showStep('category');
+            });
+        })();
+    </script>
 {% endblock %}
 
 {% block content %}
-    <header class="mb-4">
-        <h1 class="dash-page-title">Dashboard</h1>
-        <p class="dash-page-subtitle">Search all teams, employees information and contact details</p>
+    {# ===== Hero header ===== #}
+    <header class="dash-hero">
+        <div>
+            <h1 class="dash-page-title">
+                {% if request.user.first_name %}
+                    Welcome back, {{ request.user.first_name }}.
+                {% else %}
+                    {% with profile=request.user.profile %}
+                        {% if profile.first_name %}
+                            Welcome back, {{ profile.first_name }}.
+                        {% else %}
+                            Welcome back.
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+            </h1>
+            <p class="dash-page-subtitle">{% now "l, j F Y" %} · here's what's happening across Sky Hub.</p>
+        </div>
+        <span class="dash-hero-meta">
+            <span class="dash-hero-meta-dot" aria-hidden="true"></span>
+            Updated {% now "H:i" %}
+        </span>
     </header>
 
+    {# ===== KPI strip: Employees (left) + Team status group (right) ===== #}
     <div class="row g-3 mb-4">
-
-        {# ===== Team Health Overview ===== #}
-        <div class="col-12 col-xl-8">
-            <section class="dash-card h-100">
-                <h2 class="dash-card-title">Team Health Overview</h2>
-
-                <div class="dash-status-row">
-                    <span class="dash-status-pill">
-                        <span class="dash-status-dot dash-status-dot--critical"></span>
-                        <span class="dash-status-label">Critical</span>
-                        <span class="dash-status-count">{{ blocked_teams }} teams</span>
+        <div class="col-12 col-xl-3">
+            <article class="dash-kpi h-100">
+                <p class="dash-kpi-label">Employees</p>
+                <div class="dash-kpi-value">{{ total_employees }}</div>
+                {% if new_employees_this_month > 0 %}
+                    <span class="dash-kpi-delta">
+                        <i class="bi bi-arrow-up-short"></i>
+                        +{{ new_employees_this_month }} this month
                     </span>
-                    <span class="dash-status-pill">
-                        <span class="dash-status-dot dash-status-dot--risk"></span>
-                        <span class="dash-status-label">At risk</span>
-                        <span class="dash-status-count">{{ at_risk_teams }} teams</span>
-                    </span>
-                    <span class="dash-status-pill">
-                        <span class="dash-status-dot dash-status-dot--clear"></span>
-                        <span class="dash-status-label">Clear</span>
-                        <span class="dash-status-count">{{ on_track_teams }} teams</span>
+                {% else %}
+                    <span class="dash-kpi-delta dash-kpi-delta--neutral">No new joiners this month</span>
+                {% endif %}
+            </article>
+        </div>
+        <div class="col-12 col-xl-9">
+            <article class="dash-kpi-group h-100"
+                     aria-label="Team status: {{ on_track_teams }} clear, {{ at_risk_teams }} at risk, {{ blocked_teams }} blocked">
+                <div class="dash-kpi-cell dash-kpi-cell--clear">
+                    <p class="dash-kpi-label">Clear</p>
+                    <div class="dash-kpi-value">{{ on_track_teams }}</div>
+                    <span class="dash-kpi-delta dash-kpi-delta--success">
+                        <i class="bi bi-check-circle-fill"></i>
+                        On track
                     </span>
                 </div>
-            </section>
+                <div class="dash-kpi-cell dash-kpi-cell--risk">
+                    <p class="dash-kpi-label">At risk</p>
+                    <div class="dash-kpi-value">{{ at_risk_teams }}</div>
+                    {% if at_risk_teams > 0 %}
+                        <span class="dash-kpi-delta dash-kpi-delta--warning">
+                            <i class="bi bi-exclamation-circle-fill"></i>
+                            Monitor closely
+                        </span>
+                    {% else %}
+                        <span class="dash-kpi-delta dash-kpi-delta--neutral">No teams at risk</span>
+                    {% endif %}
+                </div>
+                <div class="dash-kpi-cell dash-kpi-cell--blocked">
+                    <p class="dash-kpi-label">Blocked</p>
+                    <div class="dash-kpi-value">{{ blocked_teams }}</div>
+                    {% if blocked_teams > 0 %}
+                        <span class="dash-kpi-delta dash-kpi-delta--alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            Needs attention
+                        </span>
+                    {% else %}
+                        <span class="dash-kpi-delta dash-kpi-delta--neutral">None blocked</span>
+                    {% endif %}
+                </div>
+            </article>
         </div>
-
-        {# ===== Upcoming Meetings ===== #}
-        <div class="col-12 col-xl-4">
-            <section class="dash-card h-100">
-                <h2 class="dash-card-title">Your upcoming meetings</h2>
-
-                {% for meeting in upcoming_meetings %}
-                    {% with all_participants=meeting.participants.all %}
-                        <div class="dash-meeting">
-                            <div class="flex-grow-1" style="min-width: 0;">
-                                <div class="dash-meeting-title text-truncate">{{ meeting.title }}</div>
-                                <div class="dash-meeting-time">{{ meeting.date_time|date:"D, H:i" }}</div>
-                            </div>
-                            <div class="dash-meeting-right">
-                                <span class="dash-avatar-stack">
-                                    {% for p in all_participants|slice:":3" %}
-                                        <span class="dash-avatar">{{ p.first_name|first|upper }}</span>
-                                    {% endfor %}
-                                </span>
-                                {% with extra=all_participants|length|add:"-3" %}
-                                    {% if extra > 0 %}
-                                        <span class="dash-avatar-more">+{{ extra }} more</span>
-                                    {% endif %}
-                                {% endwith %}
-                            </div>
-                        </div>
-                    {% endwith %}
-                {% empty %}
-                    <p class="dash-meeting-empty">No upcoming meetings.</p>
-                {% endfor %}
-            </section>
-        </div>
-
     </div>
 
-    {# ===== Headcount chart + Total employees ===== #}
+    {# ===== Headcount chart + Upcoming meetings ===== #}
     <div class="row g-3 mb-4">
 
         <div class="col-12 col-xl-8">
@@ -189,13 +234,37 @@
         </div>
 
         <div class="col-12 col-xl-4">
-            <section class="dash-card dash-card--metric h-100">
-                <h2 class="dash-card-title">Total employees</h2>
-                <div class="dash-metric-value">{{ total_employees }}</div>
-                <p class="dash-metric-label">
-                    across {{ total_departments }} department{{ total_departments|pluralize }}
-                    · {{ total_teams }} team{{ total_teams|pluralize }}
-                </p>
+            <section class="dash-card h-100">
+                <h2 class="dash-card-title">Upcoming meetings</h2>
+
+                {% for meeting in upcoming_meetings %}
+                    {% with all_participants=meeting.participants.all %}
+                        <div class="dash-meeting">
+                            <div class="flex-grow-1" style="min-width: 0;">
+                                <div class="dash-meeting-title text-truncate">{{ meeting.title }}</div>
+                                <div class="dash-meeting-time">{{ meeting.date_time|date:"D, j M · H:i" }}</div>
+                            </div>
+                            <div class="dash-meeting-right">
+                                <span class="dash-avatar-stack">
+                                    {% for p in all_participants|slice:":3" %}
+                                        <span class="dash-avatar">{{ p.first_name|first|upper }}</span>
+                                    {% endfor %}
+                                </span>
+                                {% with extra=all_participants|length|add:"-3" %}
+                                    {% if extra > 0 %}
+                                        <span class="dash-avatar-more">+{{ extra }}</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    {% endwith %}
+                {% empty %}
+                    <div class="dash-empty">
+                        <i class="bi bi-calendar-x"></i>
+                        <p class="dash-empty-title">No upcoming meetings</p>
+                        <p class="dash-empty-meta">Your schedule is clear.</p>
+                    </div>
+                {% endfor %}
             </section>
         </div>
 
@@ -205,13 +274,17 @@
     {{ headcount_series|json_script:"headcount-series" }}
 
     {# ===== Section separator: Employees ===== #}
-    <div class="dash-section">
+    <div class="dash-section dash-section--directory">
         <h2 class="dash-section-title">Employees</h2>
         <p class="dash-section-subtitle">Search the company directory by name, email, team, or department.</p>
     </div>
 
     {# ===== Search + Filter ===== #}
     <form method="get" action="{% url 'dashboard' %}" class="row g-3 mb-3" role="search">
+        {# Preserve active filter when typing a new search #}
+        {% if active_filter %}
+            <input type="hidden" name="{{ active_filter.type }}" value="{{ active_filter.id }}">
+        {% endif %}
         <div class="col-12 col-lg-9">
             <div class="dash-search">
                 <i class="bi bi-search dash-search-icon"></i>
@@ -219,23 +292,142 @@
                        name="q"
                        value="{{ query }}"
                        class="dash-search-input"
-                       placeholder="Search by name, email, or team department…"
+                       placeholder="Search by name, email, team, department, or manager…"
                        aria-label="Search employees"
                        autocomplete="off">
                 {% if query %}
-                    <a href="{% url 'dashboard' %}" class="dash-search-clear" aria-label="Clear search">
+                    {% if active_filter %}
+                        <a href="?{{ active_filter.type }}={{ active_filter.id }}" class="dash-search-clear" aria-label="Clear search">
+                    {% else %}
+                        <a href="{% url 'dashboard' %}" class="dash-search-clear" aria-label="Clear search">
+                    {% endif %}
                         <i class="bi bi-x-lg"></i>
                     </a>
                 {% endif %}
             </div>
         </div>
         <div class="col-12 col-lg-3">
-            <button type="button" class="dash-filter-btn" disabled>
-                <span>Filter</span>
-                <i class="bi bi-funnel"></i>
-            </button>
+            <div class="dropdown dash-filter">
+                <button type="button"
+                        class="dash-filter-btn dash-filter-toggle {% if active_filter %}dash-filter-btn--active{% endif %}"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside"
+                        aria-expanded="false">
+                    <span>
+                        Filter
+                        {% if active_filter %}<span class="dash-filter-badge">1</span>{% endif %}
+                    </span>
+                    <i class="bi bi-funnel"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end dash-filter-menu">
+                    {# --- Step 1: pick category --- #}
+                    <div class="dash-filter-step" data-step="category">
+                        <div class="dash-filter-header">Filter by</div>
+                        <button type="button" class="dash-filter-option" data-category-target="team">
+                            <span><i class="bi bi-people"></i> Team</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                        <button type="button" class="dash-filter-option" data-category-target="department">
+                            <span><i class="bi bi-diagram-3"></i> Department</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                        <button type="button" class="dash-filter-option" data-category-target="manager">
+                            <span><i class="bi bi-person-badge"></i> Manager</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                        {% if active_filter %}
+                            <div class="dash-filter-divider"></div>
+                            <a href="?{% if query %}q={{ query }}{% endif %}" class="dash-filter-option dash-filter-clear-all">
+                                <span><i class="bi bi-x-circle"></i> Clear filter</span>
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    {# --- Step 2a: pick team --- #}
+                    <div class="dash-filter-step d-none" data-step="team">
+                        <div class="dash-filter-header">
+                            <button type="button" class="dash-filter-back" aria-label="Back">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <span>Team</span>
+                        </div>
+                        <div class="dash-filter-list">
+                            {% for team in filter_teams %}
+                                <a href="?{% if query %}q={{ query }}&{% endif %}team={{ team.pk }}"
+                                   class="dash-filter-option {% if active_filter.type == 'team' and active_filter.id == team.pk %}is-active{% endif %}">
+                                    <span>{{ team.team_name }}</span>
+                                    {% if active_filter.type == 'team' and active_filter.id == team.pk %}
+                                        <i class="bi bi-check2"></i>
+                                    {% endif %}
+                                </a>
+                            {% empty %}
+                                <div class="dash-filter-empty">No teams available.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {# --- Step 2b: pick department --- #}
+                    <div class="dash-filter-step d-none" data-step="department">
+                        <div class="dash-filter-header">
+                            <button type="button" class="dash-filter-back" aria-label="Back">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <span>Department</span>
+                        </div>
+                        <div class="dash-filter-list">
+                            {% for dept in filter_departments %}
+                                <a href="?{% if query %}q={{ query }}&{% endif %}department={{ dept.pk }}"
+                                   class="dash-filter-option {% if active_filter.type == 'department' and active_filter.id == dept.pk %}is-active{% endif %}">
+                                    <span>{{ dept.department_name }}</span>
+                                    {% if active_filter.type == 'department' and active_filter.id == dept.pk %}
+                                        <i class="bi bi-check2"></i>
+                                    {% endif %}
+                                </a>
+                            {% empty %}
+                                <div class="dash-filter-empty">No departments available.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {# --- Step 2c: pick manager --- #}
+                    <div class="dash-filter-step d-none" data-step="manager">
+                        <div class="dash-filter-header">
+                            <button type="button" class="dash-filter-back" aria-label="Back">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <span>Manager</span>
+                        </div>
+                        <div class="dash-filter-list">
+                            {% for mgr in filter_managers %}
+                                <a href="?{% if query %}q={{ query }}&{% endif %}manager={{ mgr.id }}"
+                                   class="dash-filter-option {% if active_filter.type == 'manager' and active_filter.id == mgr.id %}is-active{% endif %}">
+                                    <span>{{ mgr.label }}</span>
+                                    {% if active_filter.type == 'manager' and active_filter.id == mgr.id %}
+                                        <i class="bi bi-check2"></i>
+                                    {% endif %}
+                                </a>
+                            {% empty %}
+                                <div class="dash-filter-empty">No managers available.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
+
+    {# ===== Active filter chip ===== #}
+    {% if active_filter %}
+        <div class="dash-filter-active mb-3">
+            <span class="dash-filter-chip">
+                <i class="bi bi-funnel-fill"></i>
+                {{ active_filter.label }}: <strong>{{ active_filter.value }}</strong>
+                <a href="?{% if query %}q={{ query }}{% endif %}" class="dash-filter-chip-close" aria-label="Clear filter">
+                    <i class="bi bi-x"></i>
+                </a>
+            </span>
+        </div>
+    {% endif %}
 
     {# ===== Employee details modal (populated on click) ===== #}
     <div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalTitle" aria-hidden="true">
