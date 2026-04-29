@@ -2,4 +2,73 @@
 
 {% block content %}
 <h1>Teams</h1>
+<p>Browse all teams across the organisation.</p>
+
+<form method="get" style="display:flex; gap:1rem; margin: 1.5rem 0; flex-wrap:wrap;">
+  <input
+    type="text"
+    name="q"
+    value="{{ search_query }}"
+    placeholder="Search teams..."
+    style="padding: 8px 14px; border-radius:8px; border:1px solid #ddd; flex:1; min-width:200px;">
+
+  <select name="department" style="padding: 8px 14px; border-radius:8px; border:1px solid #ddd;">
+    <option value="">All Departments</option>
+    {% for dept in departments %}
+    <option value="{{ dept.id }}" {% if dept_filter == dept.id|stringformat:"s" %}selected{% endif %}>
+      {{ dept.department_name }}
+    </option>
+    {% endfor %}
+  </select>
+
+  <select name="status" style="padding: 8px 14px; border-radius:8px; border:1px solid #ddd;">
+    <option value="">All Statuses</option>
+    <option value="on_track" {% if status_filter == "on_track" %}selected{% endif %}>On Track</option>
+    <option value="at_risk"  {% if status_filter == "at_risk"  %}selected{% endif %}>At Risk</option>
+    <option value="blocked"  {% if status_filter == "blocked"  %}selected{% endif %}>Blocked</option>
+  </select>
+
+  <button type="submit" style="padding: 8px 20px; border-radius:8px; background:#1a1a1a; color:white; border:none; cursor:pointer;">
+    Filter
+  </button>
+</form>
+
+<div class="teams-grid">
+  {% for team in teams %}
+  <a href="{% url 'team_detail' team.id %}" class="team-card">
+    <div class="team-card-header">
+      <h3>{{ team.team_name }}</h3>
+      <span class="status-badge status-{{ team.status }}">
+        {% if team.status == 'on_track' %}On Track
+        {% elif team.status == 'at_risk' %}At Risk
+        {% else %}Blocked{% endif %}
+      </span>
+    </div>
+    <p class="team-mission">{{ team.mission }}</p>
+    <div class="team-meta">
+      <div><span class="label">Department</span><span>{{ team.department_name }}</span></div>
+      <div><span class="label">Leader</span><span>{{ team.leader_name|default:"No leader" }}</span></div>
+      <div><span class="label">Members</span><span>{{ team.members.count }}</span></div>
+    </div>
+  </a>
+  {% empty %}
+  <p>No teams found.</p>
+  {% endfor %}
+</div>
+
+<style>
+  .teams-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:1.5rem; }
+  .team-card { background:white; border-radius:12px; padding:1.5rem; box-shadow:0 1px 4px rgba(0,0,0,0.08); text-decoration:none; color:inherit; display:block; transition: box-shadow 0.2s; }
+  .team-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+  .team-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; }
+  .team-card-header h3 { margin:0; font-size:1rem; font-weight:600; }
+  .team-mission { color:#666; font-size:0.875rem; margin-bottom:1rem; }
+  .team-meta { display:flex; flex-direction:column; gap:0.4rem; font-size:0.875rem; }
+  .team-meta div { display:flex; justify-content:space-between; }
+  .label { color:#999; }
+  .status-badge { font-size:0.75rem; padding:3px 10px; border-radius:999px; font-weight:500; }
+  .status-on_track { background:#e6f9f0; color:#1a9e5c; }
+  .status-at_risk  { background:#fff4e5; color:#d97706; }
+  .status-blocked  { background:#fde8e8; color:#dc2626; }
+</style>
 {% endblock %}
