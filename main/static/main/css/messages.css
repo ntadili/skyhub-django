@@ -143,3 +143,16 @@
     border-color: var(--sh-primary);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
+
+/* Drafts: row contains an edit-link + a delete form side by side */
+.skyhub-message-draft {
+    /* override the default block layout used for inbox/sent */
+    padding-right: 0.75rem;
+}
+
+.skyhub-message-draft > a {
+    /* Inherit the skyhub-message-item padding so the link area lines up
+       with inbox/sent rows visually */
+    padding: 1rem 1.25rem;
+    display: block;
+}

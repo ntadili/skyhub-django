@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ msg.subject|default:"(No subject)" }} — Sky Hub{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'main/css/messages.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+{# Flash messages (rare on this page but possible) #}
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<div class="skyhub-messages-header d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center gap-2">
+        {% if came_from == 'sent' %}
+            <a href="{% url 'messages_sent' %}" class="btn btn-outline-secondary btn-sm" aria-label="Back to Sent">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+        {% else %}
+            <a href="{% url 'messages' %}" class="btn btn-outline-secondary btn-sm" aria-label="Back to Inbox">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+        {% endif %}
+        <div>
+            <h1 class="mb-0">{{ msg.subject|default:"(No subject)" }}</h1>
+            <p class="text-muted mb-0">
+                {% if is_recipient %}From{% else %}To{% endif %}
+                {% if is_recipient %}
+                    {{ msg.sender.first_name }} {{ msg.sender.last_name }}
+                {% else %}
+                    {% if msg.recipient %}
+                        {{ msg.recipient.first_name }} {{ msg.recipient.last_name }}
+                    {% else %}
+                        (no recipient)
+                    {% endif %}
+                {% endif %}
+                · {{ msg.timestamp|date:"l j M Y, g:i A" }}
+            </p>
+        </div>
+    </div>
+    <a href="{% url 'messages_compose' %}" class="btn btn-primary">
+        <i class="bi bi-pencil-square me-1"></i>
+        New Message
+    </a>
+</div>
+
+<div class="skyhub-message-detail card">
+    <div class="card-body">
+        {% comment %}
+        linebreaks filter converts plain-text newlines to <br> and double newlines
+        to <p> blocks. Auto-escapes HTML by default so user content can't inject
+        markup. We rely on Django's auto-escape for XSS safety.
+        {% endcomment %}
+        <div class="skyhub-message-body">{{ msg.body|linebreaks }}</div>
+    </div>
+</div>
+
+{% if is_recipient %}
+<div class="mt-3">
+    <a href="{% url 'messages_compose' %}" class="btn btn-outline-primary">
+        <i class="bi bi-reply me-1"></i>
+        Reply
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}
