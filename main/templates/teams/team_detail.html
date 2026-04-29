@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="{% url 'teams' %}" style="color:#666; text-decoration:none; font-size:0.875rem;">← Back to Teams</a>
+
+<div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem;">
+  <h1>{{ team.team_name }}</h1>
+  <span class="status-badge status-{{ team.status }}">
+    {% if team.status == 'on_track' %}On Track
+    {% elif team.status == 'at_risk' %}At Risk
+    {% else %}Blocked{% endif %}
+  </span>
+</div>
+
+<p style="color:#666;">{{ team.mission }}</p>
+
+<div class="info-card">
+  <div class="info-row"><span class="label">Department</span><span>{{ team.department_name }}</span></div>
+  <div class="info-row"><span class="label">Leader</span><span>{{ team.leader_name|default:"No leader" }}</span></div>
+  <div class="info-row"><span class="label">Members</span><span>{{ team.members.count }}</span></div>
+</div>
+
+<h2 style="margin-top:2rem;">Members</h2>
+<div class="members-list">
+  {% for member in team.members.all %}
+  <div class="member-card">
+    <div class="avatar">{{ member.first_name.0 }}{{ member.last_name.0 }}</div>
+    <div>
+      <div style="font-weight:600;">{{ member.first_name }} {{ member.last_name }}</div>
+      <div style="color:#999; font-size:0.8rem;">{{ member.user.email }}</div>
+    </div>
+  </div>
+  {% empty %}
+  <p style="color:#999;">No members in this team yet.</p>
+  {% endfor %}
+</div>
+
+<style>
+  .info-card { background:white; border-radius:12px; padding:1.5rem; box-shadow:0 1px 4px rgba(0,0,0,0.08); margin-top:1rem; }
+  .info-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #f0f0f0; font-size:0.9rem; }
+  .info-row:last-child { border-bottom:none; }
+  .label { color:#999; }
+  .members-list { display:flex; flex-direction:column; gap:0.75rem; margin-top:1rem; }
+  .member-card { background:white; border-radius:12px; padding:1rem 1.5rem; box-shadow:0 1px 4px rgba(0,0,0,0.08); display:flex; align-items:center; gap:1rem; }
+  .avatar { width:40px; height:40px; border-radius:50%; background:#1a1a1a; color:white; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:0.85rem; flex-shrink:0; }
+  .status-badge { font-size:0.85rem; padding:5px 14px; border-radius:999px; font-weight:500; }
+  .status-on_track { background:#e6f9f0; color:#1a9e5c; }
+  .status-at_risk  { background:#fff4e5; color:#d97706; }
+  .status-blocked  { background:#fde8e8; color:#dc2626; }
+</style>
+{% endblock %}

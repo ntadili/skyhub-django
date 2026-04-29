@@ -94,39 +94,48 @@
 
                         <div class="skyhub-nav-group-label">Admin</div>
 
-                        <span class="nav-link disabled" aria-disabled="true">
+                        <a class="nav-link {% if name == 'reports' %}active{% endif %}"
+                           href="{% url 'reports' %}"
+                           {% if name == 'reports' %}aria-current="page"{% endif %}>
                             <span class="skyhub-nav-icon"><i class="bi bi-file-earmark-bar-graph"></i></span>
                             Reports
-                        </span>
-                        <span class="nav-link disabled" aria-disabled="true">
+                        </a>
+                        <a class="nav-link {% if name == 'settings' %}active{% endif %}"
+                           href="{% url 'settings' %}"
+                           {% if name == 'settings' %}aria-current="page"{% endif %}>
                             <span class="skyhub-nav-icon"><i class="bi bi-gear"></i></span>
                             Settings
-                        </span>
+                        </a>
                     </nav>
                     {% endwith %}
 
                     {# Footer – user + logout #}
-                    <div class="mt-auto">
-                        <hr class="skyhub-divider mb-2">
-                        <div class="skyhub-user d-flex align-items-center gap-2 mb-2">
-                            <div class="skyhub-avatar" aria-hidden="true">N</div>
-                            <div class="flex-grow-1" style="min-width: 0;">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="skyhub-user-email text-truncate">employee@skyhub.com</span>
-                                    <span class="skyhub-presence-dot" aria-label="Online"></span>
+                    {% if request.user.is_authenticated %}
+                        {% with profile=request.user.profile %}
+                        <div class="mt-auto">
+                            <hr class="skyhub-divider mb-2">
+                            <div class="skyhub-user d-flex align-items-center gap-2 mb-2">
+                                <div class="skyhub-avatar" aria-hidden="true">
+                                    {% if profile %}{{ profile.first_name|first|upper }}{% else %}{{ request.user.username|first|upper }}{% endif %}
+                                </div>
+                                <div class="flex-grow-1" style="min-width: 0;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="skyhub-user-email text-truncate" title="{{ request.user.username }}">{{ request.user.username }}</span>
+                                        <span class="skyhub-presence-dot" aria-label="Online"></span>
+                                    </div>
                                 </div>
                             </div>
+                            <hr class="skyhub-divider mb-3">
+                            <button type="button"
+                                    class="skyhub-logout"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#logoutModal">
+                                <span class="skyhub-nav-icon"><i class="bi bi-box-arrow-right"></i></span>
+                                Log out
+                            </button>
                         </div>
-                        <hr class="skyhub-divider mb-3">
-                        <button type="button"
-                                class="skyhub-logout"
-                                disabled
-                                aria-disabled="true"
-                                title="Available once authentication is wired">
-                            <span class="skyhub-nav-icon"><i class="bi bi-box-arrow-right"></i></span>
-                            Log out
-                        </button>
-                    </div>
+                        {% endwith %}
+                    {% endif %}
                 </div>
             </aside>
 
@@ -135,6 +144,36 @@
             </main>
         </div>
     </div>
+
+    {# ===== Logout confirmation modal ===== #}
+    {% if request.user.is_authenticated %}
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content skyhub-logout-modal">
+                <button type="button" class="btn-close skyhub-logout-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body text-center px-4 py-5">
+                    <div class="skyhub-logout-icon" aria-hidden="true">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </div>
+                    <h2 id="logoutModalTitle" class="skyhub-logout-title">Log out of Sky Hub?</h2>
+                    <p class="skyhub-logout-meta">You'll need to sign in again to access your dashboard.</p>
+                    <div class="skyhub-logout-actions">
+                        <button type="button" class="skyhub-logout-btn skyhub-logout-btn--ghost" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <form method="post" action="{% url 'logout' %}" class="m-0 flex-grow-1">
+                            {% csrf_token %}
+                            <button type="submit" class="skyhub-logout-btn skyhub-logout-btn--danger w-100">
+                                <i class="bi bi-box-arrow-right"></i>
+                                Log out
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}

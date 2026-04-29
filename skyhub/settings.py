@@ -110,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/London'
 
 USE_I18N = True
 
@@ -127,3 +127,24 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Authentication
+# https://docs.djangoproject.com/en/4.2/topics/auth/
+
+LOGIN_URL = 'login'                 # where @login_required sends anonymous users
+LOGIN_REDIRECT_URL = 'dashboard'    # where successful login lands by default
+LOGOUT_REDIRECT_URL = 'login'       # where logout returns the user
+
+
+# Security / proxy settings (Railway is in front of HTTPS)
+# https://docs.djangoproject.com/en/4.2/ref/settings/#csrf-trusted-origins
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://skyhub-django-production.up.railway.app',
+    'https://*.up.railway.app',
+]
+
+# Trust Railway's X-Forwarded-Proto header so request.is_secure() works
+# behind the proxy (needed for correct login/logout redirects on HTTPS).
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

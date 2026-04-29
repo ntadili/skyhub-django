@@ -1,0 +1,125 @@
+<!-- Created by Batuhan Amirzehni -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1>Reports</h1>
+      <p class="text-muted">Summary reports for Sky engineering teams and departments.</p>
+    </div>
+
+    <a href="{% url 'export_reports_csv' %}" class="btn btn-primary">
+      Export CSV
+    </a>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card p-3 shadow-sm">
+        <h6>Total Teams</h6>
+        <h2>{{ total_teams }}</h2>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card p-3 shadow-sm">
+        <h6>Total Departments</h6>
+        <h2>{{ total_departments }}</h2>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card p-3 shadow-sm">
+        <h6>Teams Without Leaders</h6>
+        <h2>{{ teams_without_leaders_count }}</h2>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card p-3 shadow-sm">
+        <h6>Blocked Teams</h6>
+        <h2>{{ blocked_teams }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header">
+      <strong>Status Summary</strong>
+    </div>
+    <div class="card-body">
+      <p>On Track Teams: <strong>{{ on_track_teams }}</strong></p>
+      <p>At Risk Teams: <strong>{{ at_risk_teams }}</strong></p>
+      <p>Blocked Teams: <strong>{{ blocked_teams }}</strong></p>
+    </div>
+  </div>
+
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header">
+      <strong>Department Summary</strong>
+    </div>
+
+    <div class="card-body">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Department</th>
+            <th>Specialisation</th>
+            <th>Number of Teams</th>
+            <th>Members</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in department_summary %}
+          <tr>
+            <td>{{ item.department.department_name }}</td>
+            <td>{{ item.department.specialisation }}</td>
+            <td>{{ item.team_count }}</td>
+            <td>{{ item.member_count }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4">No departments found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header">
+      <strong>Teams Without Leaders</strong>
+    </div>
+
+    <div class="card-body">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Team Name</th>
+            <th>Department</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for team in teams_without_leaders %}
+          <tr>
+            <td>{{ team.team_name }}</td>
+            <td>{{ team.department_name.department_name }}</td>
+            <td>{{ team.get_status_display }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3">All teams currently have leaders assigned.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

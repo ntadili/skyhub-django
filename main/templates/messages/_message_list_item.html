@@ -1,0 +1,83 @@
+{% comment %}
+Partial template: renders one row in a message list.
+Used by inbox.html, sent.html, drafts.html.
+
+Required context variables:
+    msg      - a Message instance
+    view     - one of 'inbox', 'sent', 'drafts'. Controls:
+               - whether to display the sender (inbox) or recipient (sent/drafts)
+               - the unread visual treatment (inbox only)
+               - the link target (compose?draft=<id> for drafts, # otherwise)
+               - whether to show a Delete button (drafts only)
+{% endcomment %}
+
+{% if view == 'drafts' %}
+    {% comment %}
+    Drafts are clickable to edit, and have a separate Delete form.
+    The wrapper is a div (not <a>) because we have two interactive children.
+    {% endcomment %}
+    <div class="skyhub-message-item skyhub-message-draft d-flex align-items-stretch">
+        <a href="{% url 'messages_compose' %}?draft={{ msg.pk }}"
+           class="flex-grow-1 text-decoration-none text-reset"
+           aria-label="Edit draft: {{ msg.subject|default:'(No subject)' }}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="skyhub-message-from">
+                    {% if msg.recipient %}
+                        To: {{ msg.recipient.first_name }} {{ msg.recipient.last_name }}
+                    {% else %}
+                        <span class="text-muted">No recipient</span>
+                    {% endif %}
+                </div>
+                <div class="skyhub-message-date text-muted small">
+                    Last saved {{ msg.updated_at|date:"M j, g:i A" }}
+                </div>
+            </div>
+            <div class="skyhub-message-subject">
+                {{ msg.subject|default:"(No subject)" }}
+            </div>
+            <div class="skyhub-message-preview text-muted small">
+                {{ msg.body|default:""|truncatechars:120 }}
+            </div>
+        </a>
+        <form method="post" action="{% url 'messages_delete_draft' msg.pk %}"
+              onsubmit="return confirm('Delete this draft? This cannot be undone.');"
+              class="ms-2 align-self-center">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Delete draft">
+                <i class="bi bi-trash" aria-hidden="true"></i>
+            </button>
+        </form>
+    </div>
+{% else %}
+    <a href="{% url 'messages_read' msg.pk %}{% if view == 'sent' %}?from=sent{% endif %}"
+       class="skyhub-message-item {% if view == 'inbox' and msg.status == 'unread' %}skyhub-message-unread{% endif %}"
+       aria-label="Message {% if view == 'inbox' %}from {{ msg.sender.first_name }} {{ msg.sender.last_name }}{% else %}to {{ msg.recipient.first_name|default:'(no recipient)' }} {{ msg.recipient.last_name }}{% endif %}: {{ msg.subject|default:'(No subject)' }}">
+
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="skyhub-message-from">
+                {% if view == 'inbox' and msg.status == 'unread' %}
+                    <span class="skyhub-unread-dot" aria-hidden="true"></span>
+                {% endif %}
+
+                {% if view == 'inbox' %}
+                    {{ msg.sender.first_name }} {{ msg.sender.last_name }}
+                {% else %}
+                    {% if msg.recipient %}
+                        To: {{ msg.recipient.first_name }} {{ msg.recipient.last_name }}
+                    {% else %}
+                        <span class="text-muted">No recipient</span>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="skyhub-message-date text-muted small">
+                {{ msg.timestamp|date:"M j, g:i A" }}
+            </div>
+        </div>
+        <div class="skyhub-message-subject">
+            {{ msg.subject|default:"(No subject)" }}
+        </div>
+        <div class="skyhub-message-preview text-muted small">
+            {{ msg.body|default:""|truncatechars:120 }}
+        </div>
+    </a>
+{% endif %}
