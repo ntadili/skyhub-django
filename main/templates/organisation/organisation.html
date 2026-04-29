@@ -1,5 +1,236 @@
+<!-- Created by Batuhan Amirzehni -->
+
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Organisation</h1>
+
+<div class="container mt-4">
+
+  <div class="mb-4">
+    <h1>Organisation</h1>
+    <p class="text-muted">
+      Overview of departments, teams, leaders and organisational structure within SkyHub.
+    </p>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card p-3 shadow-sm">
+        <h6>Total Departments</h6>
+        <h2>{{ total_departments }}</h2>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card p-3 shadow-sm">
+        <h6>Total Teams</h6>
+        <h2>{{ total_teams }}</h2>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card p-3 shadow-sm">
+        <h6>Total Members</h6>
+        <h2>{{ total_members }}</h2>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card p-3 shadow-sm">
+        <h6>Teams Without Leaders</h6>
+        <h2>{{ teams_without_leaders }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-header">
+      <strong>Organisation Analytics</strong>
+    </div>
+
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <p class="mb-1"><strong>On Track Teams:</strong></p>
+          <h3 style="color: green;">{{ on_track_teams }}</h3>
+        </div>
+
+        <div class="col-md-4">
+          <p class="mb-1"><strong>At Risk Teams:</strong></p>
+          <h3 style="color: orange;">{{ at_risk_teams }}</h3>
+        </div>
+
+        <div class="col-md-4">
+          <p class="mb-1"><strong>Blocked Teams:</strong></p>
+          <h3 style="color: red;">{{ blocked_teams }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-header">
+      <strong>Filters and Sorting</strong>
+    </div>
+
+    <div class="card-body">
+      <form method="get" class="row g-3">
+
+        <div class="col-md-6">
+          <label for="status" class="form-label"><strong>Filter by Team Status</strong></label>
+          <select name="status" id="status" class="form-select">
+            <option value="all" {% if selected_status == "all" %}selected{% endif %}>All Teams</option>
+            <option value="on_track" {% if selected_status == "on_track" %}selected{% endif %}>On Track</option>
+            <option value="at_risk" {% if selected_status == "at_risk" %}selected{% endif %}>At Risk</option>
+            <option value="blocked" {% if selected_status == "blocked" %}selected{% endif %}>Blocked</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label for="sort" class="form-label"><strong>Sort Departments By</strong></label>
+          <select name="sort" id="sort" class="form-select">
+            <option value="department_name" {% if selected_sort == "department_name" %}selected{% endif %}>Department Name</option>
+            <option value="team_count" {% if selected_sort == "team_count" %}selected{% endif %}>Number of Teams</option>
+            <option value="risk" {% if selected_sort == "risk" %}selected{% endif %}>Risk Level</option>
+          </select>
+        </div>
+
+        <div class="col-md-12 mt-3">
+          <button type="submit" class="btn btn-primary">Apply</button>
+          <a href="{% url 'organisation' %}" class="btn btn-secondary">Reset</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-header">
+      <strong>Department Structure</strong>
+    </div>
+
+    <div class="card-body">
+      {% if department_data %}
+        {% for item in department_data %}
+          <div class="mb-4 p-3 border rounded">
+
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h3>{{ item.department.department_name }}</h3>
+                <p class="text-muted mb-1">
+                  {{ item.department.specialisation }}
+                </p>
+
+                <p class="mb-1">
+                  <strong>Department Leader:</strong>
+                  {% if item.department.department_leader %}
+                    {{ item.department.department_leader.username }}
+                  {% else %}
+                    No leader assigned
+                  {% endif %}
+                </p>
+              </div>
+
+              <div class="text-end">
+                <p class="mb-1"><strong>{{ item.team_count }}</strong> Teams</p>
+                <p class="mb-1"><strong>{{ item.member_count }}</strong> Members</p>
+
+                {% if item.blocked_count > 0 %}
+                  <p style="color: red; font-weight: 600;">
+                    {{ item.blocked_count }} Blocked Team(s)
+                  </p>
+                {% elif item.at_risk_count > 0 %}
+                  <p style="color: orange; font-weight: 600;">
+                    {{ item.at_risk_count }} At Risk Team(s)
+                  </p>
+                {% else %}
+                  <p style="color: green; font-weight: 600;">
+                    Stable Department
+                  </p>
+                {% endif %}
+              </div>
+            </div>
+
+            <hr>
+
+            <h5>Teams in this Department</h5>
+
+            {% if item.teams %}
+              <table class="table table-striped mt-3">
+                <thead>
+                  <tr>
+                    <th>Team Name</th>
+                    <th>Mission</th>
+                    <th>Leader</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {% for team in item.teams %}
+                    <tr>
+                      <td>{{ team.team_name }}</td>
+                      <td>{{ team.mission }}</td>
+                      <td>
+                        {% if team.leader_name %}
+                          {{ team.leader_name }}
+                        {% else %}
+                          No leader assigned
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if team.status == "on_track" %}
+                          <span style="color: green; font-weight: 600;">On Track</span>
+                        {% elif team.status == "at_risk" %}
+                          <span style="color: orange; font-weight: 600;">At Risk</span>
+                        {% elif team.status == "blocked" %}
+                          <span style="color: red; font-weight: 600;">Blocked</span>
+                        {% else %}
+                          {{ team.get_status_display }}
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p class="text-muted">
+                No teams match the selected filter in this department.
+              </p>
+            {% endif %}
+
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>No departments found.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header">
+      <strong>Organisation Summary</strong>
+    </div>
+
+    <div class="card-body">
+      <p>
+        This page provides a department-level overview of the SkyHub organisation.
+        It helps users understand how teams are grouped, who leads each department,
+        and which teams may need management attention.
+      </p>
+
+      <p>
+        The page includes filtering, sorting and analytics features, allowing users
+        to identify high-risk departments and monitor team status more effectively.
+      </p>
+
+      <p>
+        The page is dynamically connected to the shared database models, so changes
+        made through the admin panel or other modules are reflected automatically.
+      </p>
+    </div>
+  </div>
+
+</div>
+
 {% endblock %}

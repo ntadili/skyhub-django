@@ -1,6 +1,8 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from main.models import Team, Department
 
+@login_required
 def team_list(request):
     teams = Team.objects.select_related('department_name', 'team_leader__profile').prefetch_related('members')
     departments = Department.objects.all()
@@ -24,6 +26,7 @@ def team_list(request):
         'search_query': search_query,
     })
 
+@login_required
 def team_detail(request, team_id):
     team = get_object_or_404(
         Team.objects.select_related('department_name', 'team_leader__profile').prefetch_related('members__user'),

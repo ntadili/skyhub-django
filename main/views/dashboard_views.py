@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render
 from django.utils import timezone
@@ -61,7 +62,7 @@ def _department_headcount_series(months=HEADCOUNT_MONTHS):
 
     return labels, series
 
-
+@login_required
 def dashboard(request):
     total_departments = Department.objects.count()
     total_teams = Team.objects.count()

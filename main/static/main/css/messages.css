@@ -1,0 +1,145 @@
+/* ===== Sky Hub – Messages module (Kirtan) ===== */
+
+.skyhub-messages-header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* ----- Tabs ----- */
+
+.skyhub-messages-tabs {
+    border-bottom: 1px solid var(--sh-border);
+    gap: 0.25rem;
+}
+
+.skyhub-messages-tabs .nav-link {
+    color: var(--sh-muted);
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.6rem 1rem;
+    font-weight: 500;
+    border-radius: 0;
+    transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+
+.skyhub-messages-tabs .nav-link:hover:not(.disabled) {
+    color: var(--sh-text);
+    background-color: var(--sh-hover);
+}
+
+.skyhub-messages-tabs .nav-link.active {
+    color: var(--sh-active);
+    border-bottom-color: var(--sh-primary);
+    background-color: transparent;
+}
+
+.skyhub-messages-tabs .nav-link.disabled {
+    color: var(--sh-muted-soft);
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* ----- Message list ----- */
+
+.skyhub-messages-list {
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.skyhub-message-item {
+    display: block;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--sh-border);
+    text-decoration: none;
+    color: var(--sh-text);
+    transition: background-color 0.15s ease;
+}
+
+.skyhub-message-item:last-child {
+    border-bottom: none;
+}
+
+.skyhub-message-item:hover {
+    background-color: var(--sh-hover);
+    color: var(--sh-text);
+}
+
+.skyhub-message-item:focus-visible {
+    outline: 2px solid var(--sh-primary);
+    outline-offset: -2px;
+    background-color: var(--sh-hover);
+}
+
+.skyhub-message-from {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: var(--sh-text);
+}
+
+.skyhub-message-subject {
+    margin-top: 0.25rem;
+    color: var(--sh-text);
+}
+
+.skyhub-message-preview {
+    margin-top: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.skyhub-message-date {
+    flex-shrink: 0;
+    padding-left: 1rem;
+    white-space: nowrap;
+}
+
+/* Unread styling — bolder + blue dot */
+.skyhub-message-unread .skyhub-message-from,
+.skyhub-message-unread .skyhub-message-subject {
+    font-weight: 600;
+}
+
+.skyhub-unread-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--sh-primary);
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+/* ----- Empty state ----- */
+
+.skyhub-empty-state {
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 0.5rem;
+}
+
+/* ----- Compose form ----- */
+
+.skyhub-compose-card {
+    background: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    max-width: 800px;
+}
+
+.skyhub-compose-card .form-label {
+    font-weight: 500;
+    color: var(--sh-text);
+    margin-bottom: 0.35rem;
+}
+
+.skyhub-compose-card .form-control:focus,
+.skyhub-compose-card .form-select:focus {
+    border-color: var(--sh-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}

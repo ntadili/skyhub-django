@@ -94,10 +94,12 @@
 
                         <div class="skyhub-nav-group-label">Admin</div>
 
-                        <span class="nav-link disabled" aria-disabled="true">
+                        <a class="nav-link {% if name == 'reports' %}active{% endif %}"
+                           href="{% url 'reports' %}"
+                           {% if name == 'reports' %}aria-current="page"{% endif %}>
                             <span class="skyhub-nav-icon"><i class="bi bi-file-earmark-bar-graph"></i></span>
                             Reports
-                        </span>
+                        </a>
                         <span class="nav-link disabled" aria-disabled="true">
                             <span class="skyhub-nav-icon"><i class="bi bi-gear"></i></span>
                             Settings
@@ -106,27 +108,32 @@
                     {% endwith %}
 
                     {# Footer – user + logout #}
-                    <div class="mt-auto">
-                        <hr class="skyhub-divider mb-2">
-                        <div class="skyhub-user d-flex align-items-center gap-2 mb-2">
-                            <div class="skyhub-avatar" aria-hidden="true">N</div>
-                            <div class="flex-grow-1" style="min-width: 0;">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="skyhub-user-email text-truncate">employee@skyhub.com</span>
-                                    <span class="skyhub-presence-dot" aria-label="Online"></span>
+                    {% if request.user.is_authenticated %}
+                        {% with profile=request.user.profile %}
+                        <div class="mt-auto">
+                            <hr class="skyhub-divider mb-2">
+                            <div class="skyhub-user d-flex align-items-center gap-2 mb-2">
+                                <div class="skyhub-avatar" aria-hidden="true">
+                                    {% if profile %}{{ profile.first_name|first|upper }}{% else %}{{ request.user.username|first|upper }}{% endif %}
+                                </div>
+                                <div class="flex-grow-1" style="min-width: 0;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="skyhub-user-email text-truncate" title="{{ request.user.username }}">{{ request.user.username }}</span>
+                                        <span class="skyhub-presence-dot" aria-label="Online"></span>
+                                    </div>
                                 </div>
                             </div>
+                            <hr class="skyhub-divider mb-3">
+                            <form method="post" action="{% url 'logout' %}" class="m-0">
+                                {% csrf_token %}
+                                <button type="submit" class="skyhub-logout">
+                                    <span class="skyhub-nav-icon"><i class="bi bi-box-arrow-right"></i></span>
+                                    Log out
+                                </button>
+                            </form>
                         </div>
-                        <hr class="skyhub-divider mb-3">
-                        <button type="button"
-                                class="skyhub-logout"
-                                disabled
-                                aria-disabled="true"
-                                title="Available once authentication is wired">
-                            <span class="skyhub-nav-icon"><i class="bi bi-box-arrow-right"></i></span>
-                            Log out
-                        </button>
-                    </div>
+                        {% endwith %}
+                    {% endif %}
                 </div>
             </aside>
 
