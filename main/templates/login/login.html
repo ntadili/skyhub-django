@@ -63,6 +63,20 @@
         .login-btn:hover {
             background-color: #000000;
         }
+        .login-foot {
+            font-size: 0.85rem;
+            color: #6b7280;
+            text-align: center;
+            margin-top: 1.25rem;
+        }
+        .login-foot a {
+            color: #111827;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .login-foot a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body class="min-vh-100 d-flex align-items-center justify-content-center p-4">
@@ -120,6 +134,10 @@
                 Sign in
             </button>
         </form>
+
+        <p class="login-foot">
+            Don't have an account? <a href="{% url 'register' %}">Create one</a>
+        </p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

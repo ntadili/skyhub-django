@@ -22,16 +22,7 @@
                 modal.querySelectorAll('[data-field]').forEach(function (el) {
                     var key = el.getAttribute('data-field');
                     var value = data[key] || '';
-
-                    if (key === 'emailLink') {
-                        var hasEmail = value && value.trim();
-                        el.setAttribute('href', hasEmail ? 'mailto:' + value : '#');
-                        el.classList.toggle('disabled', !hasEmail);
-                    } else if (key === 'email') {
-                        el.textContent = value || '—';
-                    } else {
-                        el.textContent = value || '—';
-                    }
+                    el.textContent = value || '—';
                 });
             });
         })();
@@ -182,17 +173,17 @@
             </article>
         </div>
         <div class="col-12 col-xl-9">
-            <article class="dash-kpi-group h-100"
-                     aria-label="Team status: {{ on_track_teams }} clear, {{ at_risk_teams }} at risk, {{ blocked_teams }} blocked">
-                <div class="dash-kpi-cell dash-kpi-cell--clear">
+            <div class="dash-kpi-group h-100"
+                 aria-label="Team status: {{ on_track_teams }} clear, {{ at_risk_teams }} at risk, {{ blocked_teams }} blocked">
+                <a href="{% url 'teams' %}?status=on_track" class="dash-kpi-cell dash-kpi-cell--clear">
                     <p class="dash-kpi-label">Clear</p>
                     <div class="dash-kpi-value">{{ on_track_teams }}</div>
                     <span class="dash-kpi-delta dash-kpi-delta--success">
                         <i class="bi bi-check-circle-fill"></i>
                         On track
                     </span>
-                </div>
-                <div class="dash-kpi-cell dash-kpi-cell--risk">
+                </a>
+                <a href="{% url 'teams' %}?status=at_risk" class="dash-kpi-cell dash-kpi-cell--risk">
                     <p class="dash-kpi-label">At risk</p>
                     <div class="dash-kpi-value">{{ at_risk_teams }}</div>
                     {% if at_risk_teams > 0 %}
@@ -203,8 +194,8 @@
                     {% else %}
                         <span class="dash-kpi-delta dash-kpi-delta--neutral">No teams at risk</span>
                     {% endif %}
-                </div>
-                <div class="dash-kpi-cell dash-kpi-cell--blocked">
+                </a>
+                <a href="{% url 'teams' %}?status=blocked" class="dash-kpi-cell dash-kpi-cell--blocked">
                     <p class="dash-kpi-label">Blocked</p>
                     <div class="dash-kpi-value">{{ blocked_teams }}</div>
                     {% if blocked_teams > 0 %}
@@ -215,8 +206,8 @@
                     {% else %}
                         <span class="dash-kpi-delta dash-kpi-delta--neutral">None blocked</span>
                     {% endif %}
-                </div>
-            </article>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -226,7 +217,7 @@
         <div class="col-12 col-xl-8">
             <section class="dash-card h-100">
                 <h2 class="dash-card-title">Department headcount over time</h2>
-                <p class="dash-card-meta">Cumulative employees per department (last 6 months)</p>
+                <p class="dash-card-meta">Cumulative employees per department (last 60 days)</p>
                 <div class="dash-chart-wrap">
                     <canvas id="headcountChart" aria-label="Department headcount chart" role="img"></canvas>
                 </div>
@@ -239,7 +230,7 @@
 
                 {% for meeting in upcoming_meetings %}
                     {% with all_participants=meeting.participants.all %}
-                        <div class="dash-meeting">
+                        <a href="{% url 'schedule' %}" class="dash-meeting" aria-label="Open {{ meeting.title }} in schedule">
                             <div class="flex-grow-1" style="min-width: 0;">
                                 <div class="dash-meeting-title text-truncate">{{ meeting.title }}</div>
                                 <div class="dash-meeting-time">{{ meeting.date_time|date:"D, j M · H:i" }}</div>
@@ -256,7 +247,7 @@
                                     {% endif %}
                                 {% endwith %}
                             </div>
-                        </div>
+                        </a>
                     {% endwith %}
                 {% empty %}
                     <div class="dash-empty">
@@ -477,9 +468,9 @@
                 </div>
                 <div class="emp-modal-footer">
                     <button type="button" class="dash-action-btn" data-bs-dismiss="modal">Close</button>
-                    <a href="#" class="dash-action-btn dash-action-btn--primary emp-modal-email-btn" data-field="emailLink">
-                        <i class="bi bi-envelope"></i>
-                        Send email
+                    <a href="{% url 'messages' %}" class="dash-action-btn dash-action-btn--primary">
+                        <i class="bi bi-chat-dots-fill"></i>
+                        Send message
                     </a>
                 </div>
             </div>
@@ -503,7 +494,20 @@
                 </thead>
                 <tbody>
                     {% for employee in employees %}
-                        <tr>
+                        <tr class="dash-table-row"
+                            data-bs-toggle="modal"
+                            data-bs-target="#employeeModal"
+                            data-initial="{{ employee.first_name|first|upper }}"
+                            data-emp-id="{{ employee.id|stringformat:"06d" }}"
+                            data-name="{{ employee.first_name }} {{ employee.last_name }}"
+                            data-email="{{ employee.user.email|default_if_none:'' }}"
+                            data-team="{{ employee.team|default_if_none:'—' }}"
+                            data-department="{{ employee.department|default_if_none:'—' }}"
+                            data-manager="{% if employee.team.leader_name %}{{ employee.team.leader_name }}{% else %}—{% endif %}"
+                            data-since="{{ employee.created_at|date:'M Y' }}"
+                            tabindex="0"
+                            role="button"
+                            aria-label="View details for {{ employee.first_name }} {{ employee.last_name }}">
                             <td class="dash-table-id">{{ employee.id|stringformat:"06d" }}</td>
                             <td class="dash-table-name">{{ employee.first_name }} {{ employee.last_name }}</td>
                             <td class="dash-table-email">{{ employee.user.email|default:"—" }}</td>
@@ -512,31 +516,13 @@
                             <td>{% if employee.team %}{{ employee.team.leader_name|default:"—" }}{% else %}—{% endif %}</td>
                             <td>
                                 <div class="dash-table-actions">
-                                    <button type="button"
-                                            class="dash-action-btn"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#employeeModal"
-                                            data-initial="{{ employee.first_name|first|upper }}"
-                                            data-emp-id="{{ employee.id|stringformat:"06d" }}"
-                                            data-name="{{ employee.first_name }} {{ employee.last_name }}"
-                                            data-email="{{ employee.user.email|default_if_none:'' }}"
-                                            data-team="{{ employee.team|default_if_none:'—' }}"
-                                            data-department="{{ employee.department|default_if_none:'—' }}"
-                                            data-manager="{% if employee.team.leader_name %}{{ employee.team.leader_name }}{% else %}—{% endif %}"
-                                            data-since="{{ employee.created_at|date:'M Y' }}">
-                                        View
-                                    </button>
-                                    {% if employee.user.email %}
-                                        <a href="mailto:{{ employee.user.email }}"
-                                           class="dash-action-icon"
-                                           aria-label="Email {{ employee.first_name }}">
-                                            <i class="bi bi-envelope"></i>
-                                        </a>
-                                    {% else %}
-                                        <span class="dash-action-icon dash-action-icon--muted" aria-hidden="true">
-                                            <i class="bi bi-envelope"></i>
-                                        </span>
-                                    {% endif %}
+                                    <a href="{% url 'messages' %}"
+                                       class="dash-msg-btn"
+                                       onclick="event.stopPropagation();"
+                                       aria-label="Message {{ employee.first_name }}">
+                                        <i class="bi bi-chat-dots-fill"></i>
+                                        <span>Message</span>
+                                    </a>
                                 </div>
                             </td>
                         </tr>

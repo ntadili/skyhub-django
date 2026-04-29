@@ -264,6 +264,112 @@ body {
   cursor: not-allowed;
 }
 
+/* ===== Logout confirmation modal ===== */
+
+.skyhub-logout-modal {
+  position: relative;
+  border: 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(17, 24, 39, 0.20);
+}
+
+.skyhub-logout-close {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 1;
+  opacity: 0.55;
+}
+
+.skyhub-logout-close:hover {
+  opacity: 1;
+}
+
+.skyhub-logout-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.1rem;
+  border-radius: 9999px;
+  background-color: rgba(220, 38, 38, 0.10);
+  color: var(--sh-danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+}
+
+.skyhub-logout-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--sh-text);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.45rem;
+}
+
+.skyhub-logout-meta {
+  font-size: 0.92rem;
+  color: var(--sh-muted);
+  margin-bottom: 1.5rem;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.skyhub-logout-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.skyhub-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.25rem;
+  border-radius: 0.6rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  min-width: 130px;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+
+.skyhub-logout-btn--ghost {
+  background-color: var(--sh-surface);
+  color: var(--sh-text);
+  border-color: var(--sh-border);
+}
+
+.skyhub-logout-btn--ghost:hover {
+  background-color: var(--sh-hover);
+  border-color: #d1d5db;
+}
+
+.skyhub-logout-btn--danger {
+  background-color: var(--sh-danger);
+  color: #ffffff;
+  border-color: var(--sh-danger);
+}
+
+.skyhub-logout-btn--danger:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+}
+
+@media (max-width: 480px) {
+  .skyhub-logout-actions {
+    flex-direction: column-reverse;
+  }
+
+  .skyhub-logout-btn {
+    width: 100%;
+  }
+}
+
 /* ===== Main content ===== */
 
 .skyhub-main {

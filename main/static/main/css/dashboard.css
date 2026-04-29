@@ -253,11 +253,31 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.65rem 0;
+  padding: 0.85rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid var(--sh-border);
+  border-radius: 0.6rem;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.dash-meeting:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 10px rgba(17, 24, 39, 0.05);
+  text-decoration: none;
+  color: inherit;
+  transform: translateY(-1px);
+}
+
+.dash-meeting:focus-visible {
+  outline: 2px solid var(--sh-primary);
+  outline-offset: 2px;
 }
 
 .dash-meeting + .dash-meeting {
-  border-top: 1px solid var(--sh-border);
+  margin-top: 0.6rem;
 }
 
 .dash-meeting-title {
@@ -670,6 +690,49 @@
   background-color: #f9fafb;
 }
 
+.dash-table-row {
+  cursor: pointer;
+}
+
+.dash-table-row:focus-visible {
+  outline: 2px solid var(--sh-primary);
+  outline-offset: -2px;
+}
+
+/* ---- Modern "Message" action button (employee row) ---- */
+
+.dash-msg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background-color: rgba(37, 99, 235, 0.10);
+  color: var(--sh-primary);
+  border: 1px solid transparent;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+.dash-msg-btn i {
+  font-size: 0.95rem;
+}
+
+.dash-msg-btn:hover {
+  background-color: var(--sh-primary);
+  color: #ffffff;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.dash-msg-btn:focus-visible {
+  outline: 2px solid var(--sh-primary);
+  outline-offset: 2px;
+}
+
 .dash-table-id {
   color: var(--sh-muted);
   font-variant-numeric: tabular-nums;
@@ -961,6 +1024,21 @@
   padding: 1.1rem 1.25rem;
   position: relative;
   min-width: 0;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: filter .15s ease;
+}
+
+.dash-kpi-cell:hover {
+  filter: brightness(0.97);
+  text-decoration: none;
+  color: inherit;
+}
+
+.dash-kpi-cell:focus-visible {
+  outline: 2px solid var(--sh-primary);
+  outline-offset: -2px;
 }
 
 .dash-kpi-cell + .dash-kpi-cell {

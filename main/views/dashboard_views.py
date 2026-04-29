@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -6,7 +8,9 @@ from django.utils import timezone
 from main.models import Department, Team, Meeting, Profile
 
 
-HEADCOUNT_MONTHS = 6
+# Headcount chart window: last 60 days, sampled weekly.
+HEADCOUNT_DAYS = 60
+HEADCOUNT_STEP_DAYS = 7
 
 DEPARTMENT_PALETTE = [
     '#2563eb',  # blue
@@ -18,33 +22,27 @@ DEPARTMENT_PALETTE = [
 ]
 
 
-def _month_buckets(months):
-    """Return a list of (start, end_exclusive) datetimes for the last N months,
-    oldest first. `end_exclusive` is the first day of the following month."""
+def _week_buckets(days=HEADCOUNT_DAYS, step=HEADCOUNT_STEP_DAYS):
+    """Return a list of (start, end_exclusive) datetimes covering the last
+    `days` days, stepped every `step` days, oldest first."""
     now = timezone.now()
-    cursor = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    end_today = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+    start_window = end_today - timedelta(days=days)
 
     buckets = []
-    for _ in range(months):
-        if cursor.month == 12:
-            nxt = cursor.replace(year=cursor.year + 1, month=1)
-        else:
-            nxt = cursor.replace(month=cursor.month + 1)
+    cursor = start_window
+    while cursor < end_today:
+        nxt = min(cursor + timedelta(days=step), end_today)
         buckets.append((cursor, nxt))
-
-        if cursor.month == 1:
-            cursor = cursor.replace(year=cursor.year - 1, month=12)
-        else:
-            cursor = cursor.replace(month=cursor.month - 1)
-
-    buckets.reverse()
+        cursor = nxt
     return buckets
 
 
-def _department_headcount_series(months=HEADCOUNT_MONTHS):
-    """Cumulative headcount per department across the last N months."""
-    buckets = _month_buckets(months)
-    labels = [start.strftime('%b %Y') for start, _ in buckets]
+def _department_headcount_series(days=HEADCOUNT_DAYS, step=HEADCOUNT_STEP_DAYS):
+    """Cumulative headcount per department, sampled at the end of each
+    weekly bucket across the last `days` days."""
+    buckets = _week_buckets(days, step)
+    labels = [end.strftime('%-d %b') for _start, end in buckets]
 
     series = []
     for i, dept in enumerate(Department.objects.order_by('department_name')):
