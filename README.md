@@ -123,6 +123,7 @@ main/
 │   ├── messages_views.py
 │   ├── organisation_views.py
 │   └── schedule_views.py
+|   └── reports_views.py
 │
 ├── urls/
 │   ├── dashboard_urls.py
@@ -131,6 +132,7 @@ main/
 │   ├── messages_urls.py
 │   ├── organisation_urls.py
 │   └── schedule_urls.py
+│   └── reports_urls.py
 │
 ├── templates/
 │   ├── base.html
@@ -140,6 +142,7 @@ main/
 │   ├── organisation/
 │   ├── schedule/
 │   └── login/
+|   └── reports/
 ```
 
 ---
@@ -276,6 +279,108 @@ git push origin elvin
 * Focus on your page
 * Please ask for help if unsure
 
+---
+
+---
+
+## 📊 Reports & Organisation Modules (Batuhan)
+
+The Reports and Organisation modules extend the system by introducing analytical capabilities and improving the visibility of organisational data. These modules were designed to integrate seamlessly into the existing architecture without affecting other components.
+
+---
+
+### 🔹 Organisation Module
+
+The Organisation module provides a structured overview of the system’s internal structure.
+
+#### Features
+- Displays total departments, teams, and members
+- Presents data using a clear and structured UI layout
+- Dynamically retrieves and updates data from the database
+- Improves visibility of organisational relationships
+
+#### Implementation
+- `main/views/organisation_views.py`
+- `main/urls/organisation_urls.py`
+- `main/templates/organisation/organisation.html`
+
+---
+
+### 🔹 Reports Module
+
+The Reports module introduces data analytics and export functionality.
+
+#### Features
+- Displays key metrics such as:
+  - Total teams
+  - Teams without managers
+- Provides CSV export functionality for external reporting
+- Aggregates system data into meaningful insights
+
+#### Implementation
+- `main/views/reports_views.py`
+- `main/urls/reports_urls.py`
+- `main/templates/reports/reports.html`
+
+---
+
+### 🧩 System Design Approach
+
+Both modules were implemented following strong software engineering principles:
+
+#### Separation of Concerns
+Business logic is handled in views, while presentation is managed in templates.
+
+#### Modularity
+Each module is independent and does not interfere with other components of the system.
+
+#### Reusability
+Code is structured in a way that allows reuse of logic and components.
+
+#### Scalability
+The system allows new features (e.g. additional reports or analytics) to be added without modifying existing modules.
+
+---
+
+### 📈 Future Improvements
+
+- PDF export for reports
+- Data visualisation (charts and dashboards)
+- Advanced filtering and sorting options
+- Role-based access control
+- Real-time data updates
+
+---
+
+### 🧠 Engineering Reflection
+
+The development of these modules demonstrates:
+
+- Practical application of Django in full-stack development
+- Strong understanding of MVC (Model-View-Controller) architecture
+- Ability to design modular and scalable systems
+- Experience with real-world development workflows (Git branching and feature isolation)
+
+---
+
+### 👨‍💻 Contribution (Batuhan)
+
+#### Organisation Module
+- Designed and implemented the organisational overview page
+- Developed dynamic metrics (departments, teams, members)
+- Integrated backend data with frontend templates
+- Improved system usability through structured UI design
+
+#### Reports Module
+- Designed and developed a complete reporting system
+- Implemented CSV export functionality
+- Created data aggregation logic for analytics
+- Built a fully independent feature without impacting existing modules
+
+#### Engineering Focus
+- Applied modular architecture principles
+- Ensured clean separation between logic and UI
+- Focused on scalability, maintainability, and real-world usability
 ---
 
 Good luck
