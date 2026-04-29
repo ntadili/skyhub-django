@@ -5,426 +5,237 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meeting Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f7f9fc;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
+    <link rel="stylesheet" href="schedule.css">
 
-        .container {
-            display: flex;
-            gap: 20px;
-            max-width: 1200px;
-            width: 100%;
-        }
-
-        /* Form Styling */
-        .form-section {
-            background-color: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            flex: 2;
-        }
-
-        .divider {
-            border: 0;
-            border-top: 1px solid #e1e4e8;
-            margin-bottom: 24px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #7a828a;
-            margin-bottom: 24px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .label {
-            display: block;
-            margin-bottom: 8px;
-            color: #7a828a;
-            font-size: 14px;
-        }
-
-        .input-box {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e1e4e8;
-            border-radius: 8px;
-            font-size: 14px;
-            box-sizing: border-box;
-            font-family: inherit; 
-        }
-
-        .meeting-time-row {
-            display: flex;
-            gap: 16px;
-        }
-
-        .platform-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            position: relative;
-        }
-
-        .platform-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            border: none;
-            color: white;
-            transition: background-color 0.2s;
-            background-color: #2b3a4a; /* Default state */
-        }
-
-        .platform-btn.active {
-            background-color: #3d71f5 !important;
-        }
-
-        /* Hidden input for validation */
-        #platformSelection {
-            opacity: 0;
-            position: absolute;
-            left: 50%;
-            bottom: 0;
-            width: 0;
-            height: 0;
-            pointer-events: none;
-        }
-
-        .participants-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .search-input {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            border: 1px solid #e1e4e8;
-            border-radius: 8px;
-        }
-        
-        .search-input svg { margin-right: 8px; color: #a0a6b0;}
-        .search-input input { border: none; font-size: 14px; color: #a0a6b0; width: 100%; }
-        .search-input input:focus { outline: none; }
-
-        .add-btn {
-            padding: 12px 24px;
-            background-color: transparent;
-            border: 1px solid #e1e4e8;
-            border-radius: 8px;
-            color: #a0a6b0;
-            font-weight: 500;
-            cursor: pointer;
-            min-width: 90px;
-        }
-
-        .message-box {
-            height: 120px;
-            resize: none;
-        }
-
-        .repeat-options {
-            display: flex;
-            gap: 24px;
-            margin-top: 10px;
-        }
-
-        .radio-container {
-            display: flex;
-            align-items: center;
-            gap: 3.5px;
-            font-size: 14px;
-            color: #7a828a;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .radio-container input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .radio-custom {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #e1e4e8;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: border-color 0.2s;
-        }
-
-        .radio-container input:checked ~ .radio-custom {
-            border-color: #3d71f5;
-        }
-
-        .radio-container input:checked ~ .radio-custom::after {
-            content: '';
-            width: 10px;
-            height: 10px;
-            background-color: #3d71f5;
-            border-radius: 50%;
-        }
-
-        .footer-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-top: 30px;
-        }
-
-        .btn {
-            padding: 10px 16px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        .btn-cancel { background-color: transparent; color: #7a828a; border: none; }
-        .btn-save { background-color: #2b3a4a; color: white; border: none; }
-        .btn-schedule { background-color: #3d71f5; color: white; border: none; }
-
-        /* Sidebar Styling */
-        .sidebar-section {
-            flex: 1;
-            padding: 24px 0 24px 24px;
-        }
-
-        .sidebar-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #acacac;
-            margin-bottom: 20px;
-        }
-
-        .meeting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .meeting-meta { display: flex; align-items: center; gap: 12px; }
-
-        .icon-box {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .icon-box.blue   { background-color: #3d71f5; color: white; }
-        .icon-box.green  { background-color: #3cc26a; color: white; }
-        .icon-box.orange { background-color: #f7703a; color: white; }
-        .icon-box.purple { background-color: #aa3cfc; color: white; }
-
-        .meeting-details {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .meeting-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: #2b3a4a;
-        }
-
-        .meeting-platform, .meeting-participants {
-            font-size: 12px;
-            color: #7a828a;
-        }
-
-        .meeting-time {
-            font-size: 14px;
-            font-weight: 700;
-            color: #2b3a4a;
-        }
-
-    </style>
 </head>
 <body>
+
     <div class="container">
         <form class="form-section" id="meetingForm">
             <h1 class="section-title">Meeting Details</h1>
-
             <div class="form-group">
                 <label class="label">Meeting Name:</label>
-                <input type="text" class="input-box" required>
+                <input type="text" class="input-box" id="meetingName" required>
             </div>
-
             <div class="meeting-time-row">
                 <div class="form-group" style="flex: 1;">
                     <label class="label">Date of Meeting:</label>
-                    <input type="date" class="input-box" required>
+                    <input type="date" class="input-box" id="meetingDate" required>
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label class="label">Time of Meeting:</label>
-                    <input type="time" class="input-box" required>
+                    <input type="time" class="input-box" id="meetingTime" required>
                 </div>
             </div>
-
             <div class="form-group">
                 <label class="label">Platform:</label>
                 <div class="platform-buttons">
-                    <button type="button" class="platform-btn zoom" data-value="Zoom">Zoom</button>
-                    <button type="button" class="platform-btn google-meet" data-value="Google Meet">Google Meet</button>
-                    <button type="button" class="platform-btn in-person" data-value="In-Person">In-Person</button>
-                    <button type="button" class="platform-btn custom-link" data-value="Custom Link">Custom Link</button>
-                    <input type="text" id="platformSelection" required oninvalid="this.setCustomValidity('Please select a platform')" oninput="this.setCustomValidity('')">
+                    <button type="button" class="platform-btn" data-value="Zoom">Zoom</button>
+                    <button type="button" class="platform-btn" data-value="Google Meet">Google Meet</button>
+                    <button type="button" class="platform-btn" data-value="In-Person">In-Person</button>
+                    <input type="text" id="platformSelection" required>
                 </div>
             </div>
-
             <div class="form-group">
                 <label class="label">Participants:</label>
                 <div class="participants-row">
-                    <div class="search-input">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" id="participantInput" placeholder="search for participants to add..." required>
-                    </div>
-                    <button type="button" class="add-btn">+ADD</button>
+                    <div class="search-input"><input type="text" id="participantInput" placeholder="Name..."></div>
+                    <button type="button" class="add-btn" id="addParticipantBtn">+ADD</button>
                 </div>
+                <div class="participant-list" id="participantList"></div>
             </div>
-
             <div class="form-group">
                 <label class="label">Message:</label>
-                <textarea class="input-box message-box"></textarea>
+                <textarea class="input-box message-box" id="meetingMessage"></textarea>
             </div>
 
             <div class="form-group">
                 <label class="label">Repeat:</label>
                 <div class="repeat-options">
                     <label class="radio-container">
-                        <input type="radio" name="repeat" value="one-time" required>
-                        <span class="radio-custom"></span>
-                         One-time
+                        <input type="radio" name="repeat" value="One-time" checked>
+                        <span class="radio-custom"></span> One-time
                     </label>
                     <label class="radio-container">
-                        <input type="radio" name="repeat" value="weekly">
-                        <span class="radio-custom"></span>
-                        Weekly
+                        <input type="radio" name="repeat" value="Weekly">
+                        <span class="radio-custom"></span> Weekly
                     </label>
                     <label class="radio-container">
-                        <input type="radio" name="repeat" value="monthly">
-                        <span class="radio-custom"></span>
-                        Monthly
+                        <input type="radio" name="repeat" value="Monthly">
+                        <span class="radio-custom"></span> Monthly
                     </label>
                 </div>
             </div>
 
             <hr class="divider">
             <div class="footer-actions">
-                <button type="reset" class="btn btn-cancel" id="cancelBtn">Cancel</button>
-                <button type="button" class="btn btn-save">Save Draft</button>
+                <button type="reset" class="btn btn-cancel">Cancel</button>
                 <button type="submit" class="btn btn-schedule">Schedule Meeting</button>
             </div>
         </form>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" id="upcomingMeetings">
             <div class="sidebar-title">Upcoming Meetings:</div>
+        </div>
+    </div>
 
-            <div class="meeting-item">
-                <div class="meeting-meta">
-                    <div class="icon-box blue"></div>
-                    <div class="meeting-details">
-                        <span class="meeting-name">Product sync</span>
-                        <span class="meeting-platform">Zoom</span>
-                        <span class="meeting-participants">5 participants</span>
-                    </div>
-                </div>
-                <div class="meeting-time">14:00</div>
-            </div>
-
-            <div class="meeting-item">
-                <div class="meeting-meta">
-                    <div class="icon-box green"></div>
-                    <div class="meeting-details">
-                        <span class="meeting-name">Client Call</span>
-                        <span class="meeting-platform">Google Meet</span>
-                        <span class="meeting-participants">3 parts</span>
-                    </div>
-                </div>
-                <div class="meeting-time">16:00</div>
-            </div>
-
-            <div class="meeting-item">
-                <div class="meeting-meta">
-                    <div class="icon-box orange"></div>
-                    <div class="meeting-details">
-                        <span class="meeting-name">Strategy Session</span>
-                        <span class="meeting-platform">In-Person</span>
-                        <span class="meeting-participants">Mar 15 • 2 participants</span>
-                    </div>
-                </div>
-                <div class="meeting-time">15:30</div>
-            </div>
-
-            <div class="meeting-item">
-                <div class="meeting-meta">
-                    <div class="icon-box purple"></div>
-                    <div class="meeting-details">
-                        <span class="meeting-name">Project Update</span>
-                        <span class="meeting-platform">Teams</span>
-                        <span class="meeting-participants">Tomorrow • 4 parts</span>
-                    </div>
-                </div>
-                <div class="meeting-time">10:00</div>
-            </div>
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <div class="modal-header" id="modalTitle">Meeting Details</div>
+            <div class="modal-body" id="modalBody"></div>
+            <button class="btn-cancel-meeting" id="cancelMeetingBtn">Cancel Meeting</button>
         </div>
     </div>
 
     <script>
-        const platformButtons = document.querySelectorAll('.platform-btn');
-        const hiddenInput = document.getElementById('platformSelection');
         const meetingForm = document.getElementById('meetingForm');
+        const platformButtons = document.querySelectorAll('.platform-btn');
+        const hiddenPlatformInput = document.getElementById('platformSelection');
+        const participantInput = document.getElementById('participantInput');
+        const addParticipantBtn = document.getElementById('addParticipantBtn');
+        const participantListContainer = document.getElementById('participantList');
+        const upcomingMeetingsContainer = document.getElementById('upcomingMeetings');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeModal = document.getElementById('closeModal');
+        const modalBody = document.getElementById('modalBody');
+        const modalTitle = document.getElementById('modalTitle');
+        const cancelMeetingBtn = document.getElementById('cancelMeetingBtn');
 
-        platformButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                platformButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                
-                // Update hidden input to satisfy "required" attribute
-                hiddenInput.value = button.getAttribute('data-value');
-                // Trigger validity check immediately
-                hiddenInput.setCustomValidity(''); 
+        let participants = [];
+        let scheduledMeetings = [];
+        let currentViewingId = null; // Track which meeting is currently open in modal
+
+        // Load Persistence
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('myMeetings');
+            if (saved) {
+                scheduledMeetings = JSON.parse(saved);
+                renderSidebar();
+            }
+        });
+
+        // Platform Selection
+        platformButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                platformButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                hiddenPlatformInput.value = btn.getAttribute('data-value');
             });
         });
 
-        // Reset handling for the custom platform buttons when form resets
-        meetingForm.addEventListener('reset', () => {
-            platformButtons.forEach(btn => btn.classList.remove('active'));
-            hiddenInput.value = '';
+        // Participant Handling
+        addParticipantBtn.addEventListener('click', () => {
+            const name = participantInput.value.trim();
+            if (name) {
+                participants.push(name);
+                renderParticipants();
+                participantInput.value = '';
+            }
         });
 
-        // Form submission handling
-        meetingForm.addEventListener('submit', function(e) {
+        function renderParticipants() {
+            participantListContainer.innerHTML = '';
+            participants.forEach((name, index) => {
+                const chip = document.createElement('div');
+                chip.className = 'participant-chip';
+                chip.innerHTML = `${name} <span class="remove-participant" onclick="removeParticipant(${index})">&times;</span>`;
+                participantListContainer.appendChild(chip);
+            });
+        }
+
+        window.removeParticipant = (index) => {
+            participants.splice(index, 1);
+            renderParticipants();
+        };
+
+        // Form Submit
+        meetingForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            alert('Meeting scheduled successfully!');
+            const repeatVal = document.querySelector('input[name="repeat"]:checked').value;
+
+            const meetingData = {
+                id: Date.now(),
+                name: document.getElementById('meetingName').value,
+                date: document.getElementById('meetingDate').value,
+                time: document.getElementById('meetingTime').value,
+                platform: hiddenPlatformInput.value,
+                message: document.getElementById('meetingMessage').value || "None",
+                participants: [...participants],
+                repeat: repeatVal,
+                color: ['blue', 'green', 'orange', 'purple'][Math.floor(Math.random() * 4)]
+            };
+
+            scheduledMeetings.push(meetingData);
+            localStorage.setItem('myMeetings', JSON.stringify(scheduledMeetings));
+            renderSidebar();
+
+            meetingForm.reset();
+            participants = [];
+            renderParticipants();
+            platformButtons.forEach(b => b.classList.remove('active'));
         });
+
+        function renderSidebar() {
+            // Keep the title, clear the items
+            upcomingMeetingsContainer.innerHTML = '<div class="sidebar-title">Upcoming Meetings:</div>';
+            scheduledMeetings.forEach(data => {
+                const item = document.createElement('div');
+                item.className = 'meeting-item';
+                item.setAttribute('data-id', data.id);
+                item.innerHTML = `
+                    <div class="meeting-meta">
+                        <div class="icon-box ${data.color}"></div>
+                        <div class="meeting-details">
+                            <span class="meeting-name">${data.name}</span>
+                            <span class="meeting-platform">${data.platform}</span>
+                            <span class="meeting-participants">${data.participants.length} participants</span>
+                        </div>
+                    </div>
+                    <div class="meeting-time">${data.time}</div>
+                `;
+                upcomingMeetingsContainer.appendChild(item);
+            });
+        }
+
+        // Modal/Cancel Logic
+        upcomingMeetingsContainer.addEventListener('click', (e) => {
+            const clickedItem = e.target.closest('.meeting-item');
+            if (!clickedItem) return;
+
+            currentViewingId = clickedItem.getAttribute('data-id');
+            const data = scheduledMeetings.find(m => m.id == currentViewingId);
+
+            if (data) {
+                modalTitle.innerText = data.name;
+                modalBody.innerHTML = `
+                    <p><strong>Date:</strong> ${data.date}</p>
+                    <p><strong>Time:</strong> ${data.time}</p>
+                    <p><strong>Platform:</strong> ${data.platform}</p>
+                    <p><strong>Repeat:</strong> ${data.repeat}</p>
+                    <p><strong>Participants:</strong> ${data.participants.join(', ') || 'None'}</p>
+                    <p><strong>Message:</strong> ${data.message}</p>
+                `;
+                modalOverlay.style.display = 'flex';
+            }
+        });
+
+        cancelMeetingBtn.addEventListener('click', () => {
+            if (currentViewingId) {
+                // Filter out the meeting
+                scheduledMeetings = scheduledMeetings.filter(m => m.id != currentViewingId);
+                // Update LocalStorage
+                localStorage.setItem('myMeetings', JSON.stringify(scheduledMeetings));
+                // Refresh UI
+                renderSidebar();
+                modalOverlay.style.display = 'none';
+            }
+        });
+
+        closeModal.addEventListener('click', () => modalOverlay.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target == modalOverlay) modalOverlay.style.display = 'none'; });
     </script>
 </body>
 </html>
+
+
