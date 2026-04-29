@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Messages — Sky Hub{% endblock %}
+{% block title %}Drafts — Sky Hub{% endblock %}
 
 {% block extra_css %}
     <link href="{% static 'main/css/messages.css' %}" rel="stylesheet">
@@ -9,7 +9,7 @@
 
 {% block content %}
 
-{# Flash messages from Django's messages framework — e.g. "Message sent." #}
+{# Flash messages #}
 {% if messages %}
     {% for message in messages %}
     <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} alert-dismissible fade show" role="alert">
@@ -22,7 +22,7 @@
 <div class="skyhub-messages-header d-flex justify-content-between align-items-center mb-3">
     <div>
         <h1 class="mb-0">Messages</h1>
-        <p class="text-muted mb-0">Your inbox</p>
+        <p class="text-muted mb-0">Your unsent drafts</p>
     </div>
     <a href="{% url 'messages_compose' %}" class="btn btn-primary">
         <i class="bi bi-pencil-square me-1"></i>
@@ -39,33 +39,32 @@
 
 <ul class="nav skyhub-messages-tabs mb-3" role="tablist">
     <li class="nav-item" role="presentation">
-        <a class="nav-link active" aria-current="page" href="{% url 'messages' %}">
+        <a class="nav-link" href="{% url 'messages' %}">
             <i class="bi bi-inbox me-1"></i> Inbox
-            {% if unread_count %}<span class="badge rounded-pill bg-primary ms-1">{{ unread_count }}</span>{% endif %}
         </a>
     </li>
-   <li class="nav-item" role="presentation">
+    <li class="nav-item" role="presentation">
         <a class="nav-link" href="{% url 'messages_sent' %}">
             <i class="bi bi-send me-1"></i> Sent
         </a>
     </li>
     <li class="nav-item" role="presentation">
-        <span class="nav-link disabled" aria-disabled="true" title="Drafts view — coming next">
+        <a class="nav-link active" aria-current="page" href="{% url 'messages_drafts' %}">
             <i class="bi bi-file-earmark me-1"></i> Drafts
-        </span>
+        </a>
     </li>
 </ul>
 
 <div class="skyhub-messages-list">
     {% if messages_list %}
         {% for msg in messages_list %}
-            {% include "messages/_message_list_item.html" with view='inbox' %}
+            {% include "messages/_message_list_item.html" with view='drafts' %}
         {% endfor %}
     {% else %}
         <div class="skyhub-empty-state text-center py-5">
-            <i class="bi bi-inbox fs-1 text-muted" aria-hidden="true"></i>
-            <p class="mt-3 mb-1 text-muted">No messages yet.</p>
-            <p class="small text-muted mb-0">When someone sends you a message, it'll appear here.</p>
+            <i class="bi bi-file-earmark fs-1 text-muted" aria-hidden="true"></i>
+            <p class="mt-3 mb-1 text-muted">No drafts.</p>
+            <p class="small text-muted mb-0">Drafts you save will appear here.</p>
         </div>
     {% endif %}
 </div>
