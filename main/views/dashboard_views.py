@@ -8,9 +8,9 @@ from django.utils import timezone
 from main.models import Department, Team, Meeting, Profile
 
 
-# Headcount chart window: last 60 days, sampled weekly.
-HEADCOUNT_DAYS = 60
-HEADCOUNT_STEP_DAYS = 7
+# Headcount chart window: last 40 days, sampled every 5 days.
+HEADCOUNT_DAYS = 40
+HEADCOUNT_STEP_DAYS = 5
 
 DEPARTMENT_PALETTE = [
     '#2563eb',  # blue

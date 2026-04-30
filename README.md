@@ -1,285 +1,132 @@
-# SkyHub – Django Project Guide
+# SkyHub
 
-## 🚀 Project Overview
+SkyHub is a Django-based internal management web application that brings together the day-to-day workings of an organisation in a single place. It provides a dashboard overview of company health, team and department structure, meeting scheduling, internal messaging, and reporting — all behind user authentication.
 
-SkyHub is a Django-based web application designed to manage:
+The project is built with Django, Django Templates, and Bootstrap 5, and uses SQLite as the default database.
 
-* Teams
-* Departments
-* Meetings
-* Internal communication (messages)
-* Scheduling
+## 🌐 Live Demo
 
-Each team member is responsible for building **specific pages**, while sharing the same backend (models + database).
+The project is deployed and can be accessed live here:
+
+**[https://skyhub-django-production.up.railway.app/](https://skyhub-django-production.up.railway.app/)**
 
 ---
 
-## 🧠 How the Project Works (Simple)
+## How to Run
 
-Django has 3 main parts:
-
-### 1. Models (Database)
-
-Located in:
-
-```
-main/models.py
-```
-
-This defines:
-
-* Users (built-in Django)
-* Profiles
-* Departments
-* Teams
-* Meetings
-
-👉 Everyone uses the same models. Everyone CAN ADD new models but NOT CHANGE previous models or create duplicates.
-
-Note: a model is basically a table in the ERD like team, department or code_repository ([https://app.diagrams.net/#G1uOL71CrAuLUbbfMsiOpaxTZx_7ns9gDZ#%7B%22pageId%22%3A%22y7M3dXuC5kAcrrcWm3Rq%22%7D](https://app.diagrams.net/#G1uOL71CrAuLUbbfMsiOpaxTZx_7ns9gDZ#%7B%22pageId%22%3A%22y7M3dXuC5kAcrrcWm3Rq%22%7D))
-
----
-
-### 2. Views (Logic)
-
-Located in:
-
-```
-main/views/
-```
-
-Each page has its own file:
-
-* `dashboard_views.py`
-* `login_views.py`
-* `teams_views.py`
-* `messages_views.py`
-* `organisation_views.py`
-* `schedule_views.py`
-
-👉 This is where you:
-
-* fetch data from models
-* send data to templates (templates = HTML pages)
-
----
-
-### 3. Templates (UI)
-
-Located in:
-
-```
-main/templates/
-```
-
-Each page has its own folder:
-
-```
-dashboard/
-teams/
-messages/
-organisation/
-schedule/
-login/
-```
-
-👉 This is where you:
-
-* build HTML
-* display data from views
-
----
-
-### 4. URLs (Routing)
-
-Located in:
-
-```
-main/urls/
-```
-
-Each page has its own file.
-
-👉 This connects:
-
-```
-URL → View → Template
-```
-
----
-
-## 📂 File Structure (Important)
-
-```
-main/
-│
-├── models.py
-├── admin.py
-│
-├── views/
-│   ├── dashboard_views.py
-│   ├── login_views.py
-│   ├── teams_views.py
-│   ├── messages_views.py
-│   ├── organisation_views.py
-│   └── schedule_views.py
-|   └── reports_views.py
-│
-├── urls/
-│   ├── dashboard_urls.py
-│   ├── login_urls.py
-│   ├── teams_urls.py
-│   ├── messages_urls.py
-│   ├── organisation_urls.py
-│   └── schedule_urls.py
-│   └── reports_urls.py
-│
-├── templates/
-│   ├── base.html
-│   ├── dashboard/
-│   ├── teams/
-│   ├── messages/
-│   ├── organisation/
-│   ├── schedule/
-│   └── login/
-|   └── reports/
-```
-
----
-
-## 👥 Task Assignment
-
-Each person ONLY works on their page.
-
-### Kirtan – Messages
-
-```
-main/views/messages_views.py
-main/urls/messages_urls.py
-main/templates/messages/messages.html
-```
-
-### Elvin – Schedule
-
-```
-main/views/schedule_views.py
-main/urls/schedule_urls.py
-main/templates/schedule/schedule.html
-```
-
-### Kamil – Teams
-
-```
-main/views/teams_views.py
-main/urls/teams_urls.py
-main/templates/teams/teams.html
-```
-
-### Batuhan – Organisation
-
-```
-main/views/organisation_views.py
-main/urls/organisation_urls.py
-main/templates/organisation/organisation.html
-```
-
-### Nasser – Login & Dashboard
-
-```
-main/views/dashboard_views.py
-main/urls/dashboard_urls.py
-main/templates/dashboard/index.html
-
-main/views/login_views.py
-main/urls/login_urls.py
-main/templates/login/login.html
-```
-
-### Reports – Not assigned yet
-
----
-
-## ⚠️ Important Rules
-
-* Do NOT modify  models without agreement
-* Do NOT modify other people’s files
-* Keep your work isolated to your page
-
----
-
-## 🧪 Running the Project
+### 1. Activate the virtual environment
 
 ```bash
 source venv/bin/activate
+```
+
+If you don't have a `venv` yet, create one and install the dependencies first:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 2. Apply database migrations
+
+```bash
+python manage.py migrate
+```
+
+### 3. (Optional) Create an admin user
+
+```bash
+python manage.py createsuperuser
+```
+
+### 4. Start the development server
+
+```bash
 python manage.py runserver
 ```
 
-Open:
+Then open your browser at:
 
 ```
 http://127.0.0.1:8000/
 ```
 
----
-
-## 🛠 Admin Panel
-
-Go to `/admin` to:
-
-* add teams
-* add meetings
-* test data
+The Django admin panel is available at `/admin`.
 
 ---
 
-## 🔁 Git Workflow (VERY IMPORTANT)
+## Contributions
 
-### Branches
+### Nasser Tadili — Project Lead, Sidebar Navigation, Dashboard, Login & Settings
 
-Each person works on their own branch:
+- **Founded the overall structure of the project**: set up the Django project layout, the per-page split of `views/`, `urls/`, and `templates/`, the shared models, the base template / global styling system, and the conventions every teammate followed.
+- **Created the main data models** (`Profile`, `Department`, `Team`, `Meeting`) in `main/models.py` and ran the initial migrations that the rest of the team built their features on top of.
+- **Managed the Django admin panel** — registered all models in `main/admin.py`, configured list displays / filters, and used it to seed sample data (users, teams, meetings) for the team to test against.
+- **Controlled all merges, branches, and conflict resolution** across the team — reviewed pull requests, merged feature branches into `main`, and resolved git conflicts so everyone could keep working in parallel.
+- Designed and built the global sidebar navigation (`base.html` / `base.css`) used across every authenticated page.
+- Built the **Dashboard** page: hero header, KPI strip (Employees, Clear / At risk / Blocked teams), department headcount chart (Chart.js), upcoming meetings cards, and the searchable / filterable employee directory with a click-to-open employee details modal.
+- Implemented the **Login** flow using Django's built-in `LoginView`, with a custom two-pane design and self-registration (`Create account`).
+- Built the **Settings** page where logged-in users can view their profile details and change their password.
+- Added the logout confirmation modal.
 
-```
-kirtan
-elvin
-kamil
-batuhan
-```
-
----
-
-### Save your work (DO THIS ALWAYS)
-
-```bash
-git add .
-git commit -m "what you did"
-git push origin your-name
-```
-
-Example:
-
-```bash
-git commit -m "Add schedule page UI"
-git push origin elvin
-```
+#### Files
+- `main/templates/base.html`, `main/static/main/css/base.css`
+- `main/templates/dashboard/index.html`, `main/static/main/css/dashboard.css`, `main/views/dashboard_views.py`
+- `main/templates/login/login.html`, `main/templates/login/register.html`, `main/views/login_views.py`, `main/urls/login_urls.py`
+- `main/templates/settings/settings.html`, `main/views/settings_views.py`, `main/urls/settings_urls.py`
 
 ---
 
-### Rules
+### Kirtan — Messages
 
-* NEVER push to main
-* ALWAYS push to your branch
-* commit often
-* clear messages to keep everyone on track
+- Designed and built the internal **Messages** module from the ground up, allowing authenticated users to communicate with each other inside SkyHub.
+- Created the `Message` model and added the corresponding migration so messages persist in the database.
+- Implemented the **Inbox** view that lists conversations / received messages, with read / unread states.
+- Implemented the **Compose** flow: a form to pick a recipient, write a message, and send it.
+- Wired the module into the global navigation and ensured it is gated behind authentication via `@login_required`, so only signed-in users can access it.
+- Integrated the Messages tab with the rest of the app — the "Message" button on each employee row in the dashboard directory and the "Send message" action in the employee details modal both link straight into this module.
+
+#### Files
+- `main/views/messages_views.py`
+- `main/urls/messages_urls.py`
+- `main/templates/messages/`
+- `Message` model in `main/models.py` (+ migration)
 
 ---
 
-## 🚀 Final Notes
+### Elvin — Meetings (Schedule) & Reports (partial)
 
-* Keep it simple
-* Focus on your page
-* Please ask for help if unsure
+- Designed and built the full **Meetings / Schedule** module that powers everything meeting-related in SkyHub.
+- Implemented the meeting list view with date / time information, participants, and status, plus the **scheduling UI** that lets users create new meetings.
+- Made the schedule page extend the global `base.html` so it shares the sidebar and consistent layout with the rest of the app.
+- Surfaced upcoming meetings on the dashboard via the **"Upcoming meetings"** card, which deep-links into this module.
+- Contributed partially to the **Reports** module — helped shape the data aggregation and worked alongside Batuhan on the reporting layer.
+
+#### Files
+- `main/views/schedule_views.py`
+- `main/urls/schedule_urls.py`
+- `main/templates/schedule/schedule.html`
+- `Meeting` model usage in `main/models.py`
+- Partial contributions to `main/views/reports_views.py` and `main/templates/reports/`
 
 ---
+
+## Teams Module — Kamil Babouche
+
+### Overview
+Implemented the full Teams section of the SkyHub application, allowing users to browse, search, and explore teams across the organisation.
+
+### Features
+- **Teams List Page** — Displays all teams in a responsive card grid, each showing the team name, status badge (On Track / At Risk / Blocked), department, team leader, and member count.
+- **Search & Filter** — Users can search teams by name and filter by department or status in real time.
+- **Team Detail Page** — Clicking a team card opens a dedicated detail page showing full team information and a list of all members with their initials avatar and email address.
+
+### Files Changed
+- `main/views/teams_views.py` — Added data querying, filtering logic, and team detail view
+- `main/urls/teams_urls.py` — Added URL route for the team detail page
+- `main/templates/teams/teams.html` — Built the teams list template with search/filter UI
+- `main/templates/teams/team_detail.html` — Created the team detail template with member list
 
 ---
 
@@ -291,7 +138,7 @@ The Reports and Organisation modules extend the system by introducing analytical
 
 ### 🔹 Organisation Module
 
-The Organisation module provides a structured overview of the system’s internal structure.
+The Organisation module provides a structured overview of the system's internal structure.
 
 #### Features
 - Displays total departments, teams, and members
@@ -381,6 +228,3 @@ The development of these modules demonstrates:
 - Applied modular architecture principles
 - Ensured clean separation between logic and UI
 - Focused on scalability, maintainability, and real-world usability
----
-
-Good luck

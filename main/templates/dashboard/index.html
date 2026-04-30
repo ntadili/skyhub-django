@@ -35,17 +35,35 @@
             var labels = JSON.parse(document.getElementById('headcount-labels').textContent);
             var series = JSON.parse(document.getElementById('headcount-series').textContent);
 
+            // Build a vertical gradient (color at top → transparent at bottom)
+            // for each dataset's fill area. We pass a function so Chart.js can
+            // generate it lazily once the canvas has its real height.
+            function fillGradient(color) {
+                return function (ctx) {
+                    var chart = ctx.chart;
+                    var area = chart.chartArea;
+                    if (!area) return color + '00';
+                    var g = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
+                    g.addColorStop(0, color + '55');   // ~33% opacity at top
+                    g.addColorStop(1, color + '00');   // fully transparent at bottom
+                    return g;
+                };
+            }
+
             var datasets = series.map(function (s) {
                 return {
                     label: s.label,
                     data: s.data,
                     borderColor: s.color,
-                    backgroundColor: s.color + '22',
-                    tension: 0.3,
-                    pointRadius: 3,
+                    backgroundColor: fillGradient(s.color),
+                    tension: 0.45,
+                    pointRadius: 0,
                     pointHoverRadius: 5,
-                    borderWidth: 2,
-                    fill: false,
+                    pointHoverBackgroundColor: s.color,
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBorderWidth: 2,
+                    borderWidth: 2.5,
+                    fill: true,
                 };
             });
 
@@ -56,15 +74,17 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
+                    layout: { padding: { top: 8, right: 8, bottom: 0, left: 0 } },
                     plugins: {
                         legend: {
-                            position: 'bottom',
+                            position: 'top',
+                            align: 'start',
                             labels: {
-                                boxWidth: 10,
-                                boxHeight: 10,
-                                usePointStyle: true,
-                                font: { size: 12 },
-                                color: '#4b5563',
+                                boxWidth: 12,
+                                boxHeight: 12,
+                                usePointStyle: false,
+                                font: { size: 12, weight: '500' },
+                                color: '#374151',
                                 padding: 16,
                             },
                         },
@@ -72,25 +92,36 @@
                             backgroundColor: '#111827',
                             titleColor: '#f9fafb',
                             bodyColor: '#f9fafb',
-                            padding: 10,
-                            cornerRadius: 8,
+                            padding: 12,
+                            cornerRadius: 10,
                             displayColors: true,
+                            boxPadding: 4,
                         },
                     },
                     scales: {
                         x: {
                             grid: { display: false },
-                            ticks: { color: '#6b7280', font: { size: 11 } },
+                            border: { display: false },
+                            ticks: {
+                                color: '#9ca3af',
+                                font: { size: 11 },
+                                padding: 6,
+                            },
                         },
                         y: {
                             beginAtZero: true,
                             ticks: {
                                 precision: 0,
                                 stepSize: 1,
-                                color: '#6b7280',
+                                color: '#9ca3af',
                                 font: { size: 11 },
+                                padding: 8,
                             },
-                            grid: { color: '#e5e7eb', drawBorder: false },
+                            grid: {
+                                color: '#eef0f4',
+                                drawTicks: false,
+                            },
+                            border: { display: false, dash: [4, 4] },
                         },
                     },
                 },
@@ -159,7 +190,7 @@
     {# ===== KPI strip: Employees (left) + Team status group (right) ===== #}
     <div class="row g-3 mb-4">
         <div class="col-12 col-xl-3">
-            <article class="dash-kpi h-100">
+            <a href="#employees" class="dash-kpi dash-kpi--link h-100" aria-label="Jump to employees directory">
                 <p class="dash-kpi-label">Employees</p>
                 <div class="dash-kpi-value">{{ total_employees }}</div>
                 {% if new_employees_this_month > 0 %}
@@ -170,7 +201,7 @@
                 {% else %}
                     <span class="dash-kpi-delta dash-kpi-delta--neutral">No new joiners this month</span>
                 {% endif %}
-            </article>
+            </a>
         </div>
         <div class="col-12 col-xl-9">
             <div class="dash-kpi-group h-100"
@@ -217,7 +248,7 @@
         <div class="col-12 col-xl-8">
             <section class="dash-card h-100">
                 <h2 class="dash-card-title">Department headcount over time</h2>
-                <p class="dash-card-meta">Cumulative employees per department (last 60 days)</p>
+                <p class="dash-card-meta">Cumulative employees per department (last 40 days)</p>
                 <div class="dash-chart-wrap">
                     <canvas id="headcountChart" aria-label="Department headcount chart" role="img"></canvas>
                 </div>
@@ -265,7 +296,7 @@
     {{ headcount_series|json_script:"headcount-series" }}
 
     {# ===== Section separator: Employees ===== #}
-    <div class="dash-section dash-section--directory">
+    <div id="employees" class="dash-section dash-section--directory">
         <h2 class="dash-section-title">Employees</h2>
         <p class="dash-section-subtitle">Search the company directory by name, email, team, or department.</p>
     </div>

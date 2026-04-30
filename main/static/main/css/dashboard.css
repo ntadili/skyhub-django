@@ -655,6 +655,16 @@
   border: 1px solid var(--sh-border);
   border-radius: 0.75rem;
   overflow: hidden;
+  margin-bottom: 6rem;
+}
+
+/* Smooth scroll + room above the directory section when jumped to via #employees */
+html {
+  scroll-behavior: smooth;
+}
+
+#employees {
+  scroll-margin-top: 1.5rem;
 }
 
 .dash-table {
@@ -941,6 +951,23 @@
   border-color: #d1d5db;
   box-shadow: 0 6px 16px rgba(17, 24, 39, 0.06);
   transform: translateY(-1px);
+}
+
+.dash-kpi--link,
+.dash-kpi--link:hover,
+.dash-kpi--link:focus,
+.dash-kpi--link * {
+  text-decoration: none !important;
+  color: inherit;
+}
+
+.dash-kpi--link {
+  cursor: pointer;
+}
+
+.dash-kpi--link:focus-visible {
+  outline: 2px solid var(--sh-primary);
+  outline-offset: 2px;
 }
 
 .dash-kpi-label {
